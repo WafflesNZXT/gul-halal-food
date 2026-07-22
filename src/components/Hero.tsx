@@ -55,7 +55,7 @@ export function Hero() {
               transition={{ duration: 0.5, delay: 0.2 }}
               className="text-lg md:text-xl text-foreground/80 max-w-xl mb-8 leading-relaxed font-sans"
             >
-              Delicious, authentic, and 100% halal catering for your special moments. From family gatherings to big celebrations — we've got you covered!
+              Delicious Pakistani halal catering for your special moments. From family gatherings to big celebrations — we're here to help.
             </motion.p>
 
             <motion.div 

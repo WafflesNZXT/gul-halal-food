@@ -16,8 +16,8 @@ export const values: ValueItem[] = [
   },
   {
     id: "halal",
-    title: "100% Halal",
-    description: "Sourced with integrity. All our meats and ingredients are certified halal.",
+    title: "Halal Pakistani Food",
+    description: "Pakistani halal food prepared for gatherings and events.",
     iconName: "CheckCircle2",
     colorTheme: "cream"
   },

@@ -1,5 +1,4 @@
 import React from "react";
-import logoImg from "@assets/image_1784700099561.png";
 import { config } from "@/data/config";
 import { Mail, MapPin, Phone } from "lucide-react";
 import {
@@ -9,7 +8,11 @@ import {
 } from "react-icons/fa";
 import { Link } from "wouter";
 
+const logoImg = `${import.meta.env.BASE_URL.replace(/\/$/, "")}/brand/gul-logo-full.webp`;
+
 export function Footer() {
+  const hasContactDetails = Boolean(config.address || config.phone || config.email);
+
   return (
     <footer className="bg-[#174A2B] text-[#DDE8C8] relative overflow-hidden">
       {/* Decorative background SVG */}
@@ -36,15 +39,15 @@ export function Footer() {
               Authentic Pakistani halal catering for your most cherished moments. Bringing family recipes to your table since 1985.
             </p>
             <div className="flex gap-4">
-              <a href={config.social.facebook} className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-secondary transition-colors" aria-label="Facebook">
+              {config.social.facebook && <a href={config.social.facebook} className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-secondary transition-colors" aria-label="Facebook">
                 <FaFacebookF size={20} className="text-white" />
-              </a>
-              <a href={config.social.instagram} className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-secondary transition-colors" aria-label="Instagram">
+              </a>}
+              {config.social.instagram && <a href={config.social.instagram} className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-secondary transition-colors" aria-label="Instagram">
                 <FaInstagram size={20} className="text-white" />
-              </a>
-              <a href={config.social.twitter} className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-secondary transition-colors" aria-label="Twitter">
+              </a>}
+              {config.social.twitter && <a href={config.social.twitter} className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-secondary transition-colors" aria-label="Twitter">
                 <FaTwitter size={20} className="text-white" />
-              </a>
+              </a>}
             </div>
           </div>
 
@@ -73,37 +76,34 @@ export function Footer() {
           </div>
 
           {/* Column 4: Contact */}
-          <div>
+          {hasContactDetails && <div>
             <h4 className="font-display text-2xl text-white mb-6">Contact Us</h4>
             <ul className="space-y-4">
-              <li className="flex items-start gap-3">
+              {config.address && <li className="flex items-start gap-3">
                 <MapPin size={20} className="text-secondary shrink-0 mt-1" />
                 <span className="text-[#DDE8C8]/80">{config.address}</span>
-              </li>
-              <li className="flex items-center gap-3">
+              </li>}
+              {config.phone && <li className="flex items-center gap-3">
                 <Phone size={20} className="text-secondary shrink-0" />
                 <a href={`tel:${config.phone.replace(/[^0-9+]/g, '')}`} className="text-[#DDE8C8]/80 hover:text-white transition-colors">{config.phone}</a>
-              </li>
-              <li className="flex items-center gap-3">
+              </li>}
+              {config.email && <li className="flex items-center gap-3">
                 <Mail size={20} className="text-secondary shrink-0" />
                 <a href={`mailto:${config.email}`} className="text-[#DDE8C8]/80 hover:text-white transition-colors">{config.email}</a>
-              </li>
+              </li>}
             </ul>
 
             <div className="mt-8 p-4 bg-white/5 rounded-xl border border-white/10 flex items-center gap-3">
-              <div className="w-10 h-10 bg-secondary rounded-full flex items-center justify-center shrink-0">
-                <span className="text-white font-bold text-sm">100%</span>
-              </div>
-              <span className="font-bold text-white leading-tight">Proudly serving<br/>Halal food since {config.established}</span>
+              <span className="font-bold text-white leading-tight">{config.slogan}</span>
             </div>
-          </div>
+          </div>}
         </div>
 
         <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-[#DDE8C8]/60">
           <p>&copy; {new Date().getFullYear()} {config.businessName}. All rights reserved.</p>
           <div className="flex gap-6">
-            <Link href="/" className="hover:text-white transition-colors">Privacy Policy</Link>
-            <Link href="/" className="hover:text-white transition-colors">Terms of Service</Link>
+            <span>Privacy policy coming soon</span>
+            <span>Terms coming soon</span>
           </div>
         </div>
       </div>

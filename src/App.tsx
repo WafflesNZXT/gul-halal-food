@@ -13,6 +13,7 @@ import Gallery from '@/pages/gallery';
 import Testimonials from '@/pages/testimonials';
 import Contact from '@/pages/contact';
 import Quote from '@/pages/quote';
+import { RouteMetadata } from '@/components/RouteMetadata';
 
 const queryClient = new QueryClient();
 
@@ -37,6 +38,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, '')}>
+          <RouteMetadata />
           <Router />
         </WouterRouter>
         <Toaster />

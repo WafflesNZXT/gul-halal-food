@@ -16,7 +16,7 @@ export const menu: MenuItem[] = [
     spiceLevel: 2,
     icon: "🥘",
     category: "Rice Dishes",
-    price: "From $12/person"
+    price: "Contact for pricing"
   },
   {
     id: "beef-haleem",
@@ -25,7 +25,7 @@ export const menu: MenuItem[] = [
     spiceLevel: 1,
     icon: "🥣",
     category: "Curries",
-    price: "From $14/person"
+    price: "Contact for pricing"
   },
   {
     id: "chicken-karahi",
@@ -34,7 +34,7 @@ export const menu: MenuItem[] = [
     spiceLevel: 3,
     icon: "🍲",
     category: "Curries",
-    price: "From $15/person"
+    price: "Contact for pricing"
   },
   {
     id: "seekh-kebab",
@@ -43,7 +43,7 @@ export const menu: MenuItem[] = [
     spiceLevel: 2,
     icon: "🍢",
     category: "Meat Specialties",
-    price: "From $16/person"
+    price: "Contact for pricing"
   },
   {
     id: "samosas",
@@ -52,7 +52,7 @@ export const menu: MenuItem[] = [
     spiceLevel: 1,
     icon: "🥟",
     category: "Appetizers",
-    price: "$3 each"
+    price: "Contact for pricing"
   },
   {
     id: "naan-raita",
@@ -61,7 +61,7 @@ export const menu: MenuItem[] = [
     spiceLevel: 0,
     icon: "🫓",
     category: "Breads & Sides",
-    price: "$4 per serving"
+    price: "Contact for pricing"
   },
   {
     id: "palak-paneer",
@@ -70,7 +70,7 @@ export const menu: MenuItem[] = [
     spiceLevel: 1,
     icon: "🥬",
     category: "Vegetarian",
-    price: "From $13/person"
+    price: "Contact for pricing"
   },
   {
     id: "gulab-jamun",
@@ -79,6 +79,6 @@ export const menu: MenuItem[] = [
     spiceLevel: 0,
     icon: "🍯",
     category: "Desserts",
-    price: "$5 per serving"
+    price: "Contact for pricing"
   }
 ];

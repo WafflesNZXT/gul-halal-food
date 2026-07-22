@@ -4,7 +4,8 @@ import { PageHeader } from "@/components/PageHeader";
 import { WhyChooseUs } from "@/components/WhyChooseUs";
 import { QuoteCTA } from "@/components/QuoteCTA";
 import { config } from "@/data/config";
-import logoImg from "@assets/image_1784700099561.png";
+
+const logoImg = `${import.meta.env.BASE_URL.replace(/\/$/, "")}/brand/gul-logo-full.webp`;
 
 export default function About() {
   return (
@@ -30,25 +31,15 @@ export default function About() {
             <div className="w-full lg:w-1/2 space-y-6 text-foreground/80 text-lg leading-relaxed">
               <h2 className="text-3xl md:text-5xl font-display text-primary mb-6">Family Recipes, Shared with Love</h2>
               <p>
-                Since {config.established}, {config.businessName} has been a cornerstone of our community's celebrations. What started as a small family kitchen sharing traditional recipes with neighbors has grown into a beloved catering service spanning the {config.serviceArea}.
+                Since {config.established}, {config.businessName} has shared Pakistani halal food for gatherings and celebrations.
               </p>
               <p>
-                We believe that food is more than just sustenance—it's a way to show care, hospitality, and love. Every dish we prepare is rooted in authentic Pakistani culinary tradition, using the same spice blends and slow-cooking methods our grandparents taught us in Karachi.
+                We believe that food is more than just sustenance—it's a way to show care, hospitality, and love. Every dish we prepare is rooted in Pakistani culinary tradition.
               </p>
               <p>
-                Whether we're serving 50 people or 500, we never compromise on quality or our 100% halal commitment. When you choose us for your event, you're not just getting a caterer; you're inviting our family to cook for yours.
+                When you choose us for your event, you're inviting our family to cook for yours.
               </p>
 
-              <div className="grid grid-cols-2 gap-6 mt-10">
-                <div className="bg-card p-6 rounded-3xl border border-border shadow-sm text-center">
-                  <span className="block text-4xl font-display text-secondary mb-2">35+</span>
-                  <span className="text-sm font-bold text-foreground">Years of Experience</span>
-                </div>
-                <div className="bg-card p-6 rounded-3xl border border-border shadow-sm text-center">
-                  <span className="block text-4xl font-display text-secondary mb-2">10k+</span>
-                  <span className="text-sm font-bold text-foreground">Happy Guests Served</span>
-                </div>
-              </div>
             </div>
           </div>
         </div>

@@ -36,7 +36,7 @@ export default function GalleryPage() {
     <Layout>
       <PageHeader 
         title="Event Gallery" 
-        description="Take a look at the delicious moments and beautiful setups we've helped create for families and organizations across the Bay Area."
+        description="Take a look at food and catering setups from Gul Halal Food."
       />
       
       <section className="py-20 bg-background">

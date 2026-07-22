@@ -45,12 +45,12 @@ export function QuoteCTA() {
                 <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
               </Button>
             </Link>
-            <a href={`tel:${config.phone.replace(/[^0-9+]/g, '')}`} className="w-full sm:w-auto">
+            {config.phone && <a href={`tel:${config.phone.replace(/[^0-9+]/g, '')}`} className="w-full sm:w-auto">
               <Button size="lg" variant="outline" className="w-full sm:w-auto rounded-full bg-white text-primary border-transparent hover:bg-muted font-bold px-8 h-14 text-lg shadow-sm">
                 <Phone className="mr-2 h-5 w-5" />
                 Call Us
               </Button>
-            </a>
+            </a>}
           </div>
         </div>
       </div>

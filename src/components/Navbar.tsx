@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
-import logoImg from "@assets/image_1784700099561.png";
 import { Link, useLocation } from "wouter";
+
+const logoImg = `${import.meta.env.BASE_URL.replace(/\/$/, "")}/brand/gul-logo-navbar.webp`;
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);

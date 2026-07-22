@@ -31,13 +31,13 @@ export function About() {
             
             <div className="space-y-4 text-foreground/80 text-lg leading-relaxed">
               <p>
-                Since 1985, Gul Halal Food has been a cornerstone of our community's celebrations. What started as a small family kitchen sharing traditional recipes with neighbors has grown into a beloved catering service.
+                Since 1985, Gul Halal Food has shared Pakistani halal food for gatherings and celebrations.
               </p>
               <p>
-                We believe that food is more than just sustenance—it's a way to show care, hospitality, and love. Every dish we prepare is rooted in authentic Pakistani culinary tradition, using the same spice blends and slow-cooking methods our grandparents taught us.
+                We believe that food is more than just sustenance—it's a way to show care, hospitality, and love. Every dish we prepare is rooted in Pakistani culinary tradition.
               </p>
               <p>
-                Whether we're serving 50 people or 500, we never compromise on quality or our 100% halal commitment. When you choose us for your event, you're not just getting a caterer; you're inviting our family to cook for yours.
+                When you choose us for your event, you're inviting our family to cook for yours.
               </p>
             </div>
 
