@@ -1,7 +1,12 @@
 import React from "react";
 import logoImg from "@assets/image_1784700099561.png";
 import { config } from "@/data/config";
-import { Facebook, Instagram, Twitter, Mail, MapPin, Phone } from "lucide-react";
+import { Mail, MapPin, Phone } from "lucide-react";
+import {
+  FaFacebookF,
+  FaInstagram,
+  FaTwitter,
+} from "react-icons/fa";
 import { Link } from "wouter";
 
 export function Footer() {
@@ -32,13 +37,13 @@ export function Footer() {
             </p>
             <div className="flex gap-4">
               <a href={config.social.facebook} className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-secondary transition-colors" aria-label="Facebook">
-                <Facebook size={20} className="text-white" />
+                <FaFacebookF size={20} className="text-white" />
               </a>
               <a href={config.social.instagram} className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-secondary transition-colors" aria-label="Instagram">
-                <Instagram size={20} className="text-white" />
+                <FaInstagram size={20} className="text-white" />
               </a>
               <a href={config.social.twitter} className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-secondary transition-colors" aria-label="Twitter">
-                <Twitter size={20} className="text-white" />
+                <FaTwitter size={20} className="text-white" />
               </a>
             </div>
           </div>
