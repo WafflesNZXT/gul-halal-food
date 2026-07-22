@@ -1,0 +1,570 @@
+Build a polished, production-quality website for a family-owned Pakistani catering business called “Gul Halal Food.”
+
+This first version should focus on an exceptional responsive frontend. The project must be clean, component-based, easy to continue editing in Codex, and ready to push to GitHub.
+
+IMPORTANT ASSETS
+
+I have uploaded:
+
+1. The final Gul Halal Food logo
+2. A hero-section reference image showing the exact visual direction
+
+Use the final logo exactly as provided. Do not redraw it, replace it, change its colors, alter the illustrated woman, or modify the embedded slogan.
+
+The final logo slogan is:
+
+“Excellence in halal food since 1985”
+
+The hero-reference screenshot is the primary visual reference for the entire website. Recreate its composition, warmth, playfulness, spacing, color palette, illustration style, and overall personality as closely as possible.
+
+Do not place the entire hero screenshot on the page as one flat image. The navigation, headings, paragraphs, buttons, feature badges, and other interface elements must be real responsive HTML components. Use the reference image only as a visual design guide and, where necessary, as a source for the complex food artwork.
+
+BUSINESS IDENTITY
+
+Business name:
+Gul Halal Food
+
+Business type:
+Family-owned Pakistani halal catering
+
+Brand positioning:
+Authentic homemade Pakistani food prepared with warmth, hospitality, and family tradition.
+
+Primary brand statement:
+Homemade Pakistani Food, Made with Love
+
+Heritage statement:
+Excellence in halal food since 1985
+
+Important:
+This is Pakistani catering, not Afghan catering. All website text, food references, visuals, and metadata must consistently describe Pakistani food.
+
+TECH STACK
+
+Use:
+
+- Next.js with the App Router
+- TypeScript
+- Tailwind CSS
+- Reusable React components
+- Lucide React for interface icons
+- Framer Motion only for subtle animations
+- Static local data files for menu items, testimonials, and services
+
+Do not create a database or complicated backend yet.
+
+The quote form should have polished frontend validation and a temporary demo-success state. Leave a clearly labeled TODO in the code for connecting the form to a real email service or backend later.
+
+Organize the project so that it can be pushed directly to GitHub and continued in Codex without needing a major rewrite.
+
+DESIGN DIRECTION
+
+The website should feel:
+
+- Warm
+- Playful
+- Modern
+- Family-oriented
+- Welcoming
+- Premium without feeling formal or corporate
+- Inspired by illustrated Pakistani food packaging and storybook artwork
+- Cartoonish in a tasteful, professional way
+- Authentic rather than generic
+
+Avoid:
+
+- Dark luxury restaurant styling
+- Black-and-gold fine-dining visuals
+- Minimalist tech-startup styling
+- Generic stock restaurant templates
+- Excessive gradients
+- Glassmorphism
+- Neon colors
+- Heavy animations
+- Photorealistic stock-photo layouts
+- An overly childish appearance
+
+COLOR SYSTEM
+
+Use colors closely matching the supplied logo and hero reference:
+
+- Warm cream background: approximately #FFF8E8
+- Soft ivory cards: approximately #FFFDF7
+- Deep forest green: approximately #245D35
+- Darker green for text and footer: approximately #174A2B
+- Fresh medium green: approximately #568B3C
+- Warm orange: approximately #F36B21
+- Golden yellow: approximately #E7A529
+- Soft sage green: approximately #DDE8C8
+- Warm brown body text: approximately #5C3C27
+- Light beige borders: approximately #EADBBE
+
+Use green as the primary action color and orange as the supporting accent.
+
+TYPOGRAPHY
+
+Use a playful rounded display font for major headings and a highly readable rounded sans-serif font for body text.
+
+Recommended combination:
+
+- Headings: Fredoka
+- Body and interface: Nunito Sans
+
+Headings should feel hand-crafted and friendly, but all paragraph text must remain easy to read.
+
+GLOBAL VISUAL LANGUAGE
+
+Use:
+
+- Large rounded containers
+- Soft cream backgrounds
+- Organic curved section dividers
+- Illustrated leaves and floral decorations
+- Small hearts, sparkles, swirls, and hand-drawn accents
+- Pakistani-inspired arch shapes
+- Thin green botanical outlines
+- Gentle shadows
+- Warm beige borders
+- Rounded buttons
+- Illustrated food cards
+- Subtle texture without making the page look dirty or old
+
+Decorative elements should support the content rather than overwhelm it.
+
+NAVIGATION
+
+Create a large rounded navigation bar matching the reference image.
+
+Desktop navigation:
+
+- Logo on the left
+- Home
+- Our Menu
+- Catering Services
+- About Us
+- Gallery
+- Testimonials
+- Contact
+- “Request a Quote” primary button on the right
+
+Requirements:
+
+- Use the final uploaded logo
+- Keep the logo clear and readable
+- Give the navbar a warm ivory background
+- Use a subtle border and soft shadow
+- Use a rounded rectangular container
+- Keep generous horizontal spacing
+- Add a small green underline to the active page
+- Make the navbar sticky after the user begins scrolling
+- Reduce its vertical height slightly when sticky
+- Add smooth anchor scrolling
+
+Mobile navigation:
+
+- Logo on the left
+- Menu button on the right
+- Animated slide-down or side-drawer menu
+- Large tap targets
+- Include the quote button inside the mobile menu
+- Prevent background scrolling while the menu is open
+
+HERO SECTION — RECREATE THIS VERY CLOSELY
+
+The hero should match the uploaded reference as closely as possible.
+
+Desktop layout:
+
+- Full-width warm cream background
+- Large rounded navbar near the top
+- Left content column taking approximately 42–45% of the width
+- Right illustrated Pakistani food composition taking approximately 55–58%
+- Organic arch-shaped illustration frame behind the food
+- Large food artwork that reaches toward the bottom edge
+- Decorative leaves, sparkles, tiny hearts, and line doodles
+- Dark green organic wave at the bottom
+- Centered message inside the green wave
+
+Hero heading:
+
+“Homemade Pakistani
+Food, Made with Love”
+
+Use dark green for most of the heading.
+
+Use orange for the words “Love” or “Made with Love.”
+
+Add a small hand-drawn orange heart after the heading and a green underline flourish beneath part of it.
+
+Hero supporting paragraph:
+
+“Delicious, authentic, and 100% halal catering for your special moments. From family gatherings to big celebrations — we’ve got you covered!”
+
+Primary hero button:
+
+“Book Your Event”
+
+- Green background
+- White text
+- Calendar icon
+- Rounded corners
+- Soft shadow
+- Slight lift on hover
+
+Secondary hero button:
+
+“View Our Menu”
+
+- Cream or transparent background
+- Green text
+- Beige-green border
+- Leaf icon
+- Rounded corners
+
+Trust features under the buttons:
+
+1. 100% Halal
+   Prepared with care and authenticity
+
+2. Homemade Taste
+   Traditional recipes just like home
+
+3. Made for Every Occasion
+   Weddings, parties, and more!
+
+Each feature should have:
+
+- A circular pale-green or pale-yellow icon background
+- A small clean icon
+- Bold short title
+- Smaller supporting text
+- Subtle vertical separators on desktop
+
+RIGHT-SIDE HERO ARTWORK
+
+Reproduce the general composition from the reference:
+
+- A large decorative Pakistani-style arch
+- A central illustrated bowl of chicken biryani
+- Chana or chickpea dish
+- Raita
+- Samosas with green chutney
+- Pakistani curry or kebab dish
+- Naan in a basket
+- A drink pitcher
+- Green leaves and botanical details
+- Warm floral serving dishes
+- A tablecloth with subtle Pakistani-inspired floral patterns
+- Soft mosque or architectural silhouettes in the distant background
+
+Keep the food illustrated and playful rather than photorealistic.
+
+The food arrangement should feel abundant and celebratory.
+
+Do not label the business as Afghan and do not use Afghan cultural references.
+
+BOTTOM HERO RIBBON
+
+Create the same organic deep-green wave across the bottom of the hero.
+
+Centered text:
+
+“Bringing people together, one meal at a time.”
+
+Use white or warm cream text with small golden decorative flourishes on both sides.
+
+The hero should fill most of the first desktop viewport while still allowing a hint of the next section to appear below.
+
+MOBILE HERO
+
+On mobile:
+
+- Stack the text above the food illustration
+- Keep the heading large but prevent awkward single-word wrapping
+- Place the two buttons vertically or in a responsive two-column arrangement
+- Display trust features as compact cards
+- Move the food artwork below the text
+- Preserve the decorative arch
+- Reduce decorative elements that cause crowding
+- Keep the bottom green wave
+- Do not create horizontal overflow
+
+HOME PAGE SECTIONS
+
+After the hero, build the following sections in the same visual style.
+
+1. FEATURED MENU
+
+Heading:
+“A Taste of Home”
+
+Supporting text:
+Introduce the menu as traditional Pakistani favorites prepared for gatherings and celebrations.
+
+Create attractive illustrated menu cards for editable sample items such as:
+
+- Chicken Biryani
+- Beef Haleem
+- Chicken Karahi
+- Seekh Kebab
+- Samosas
+- Naan and Raita
+
+These are sample entries and must be stored in an easy-to-edit data file.
+
+Each card should include:
+
+- Dish image or illustrated placeholder
+- Dish name
+- Short description
+- Dietary or spice indicators when applicable
+- “View Details” interaction
+
+Add a “View Full Menu” button.
+
+Do not invent prices unless clearly marked as temporary placeholders.
+
+2. CATERING SERVICES
+
+Heading:
+“Made for Every Occasion”
+
+Create service cards for:
+
+- Weddings
+- Family Gatherings
+- Community Events
+- Corporate Events
+- Birthdays and Celebrations
+- Custom Catering
+
+Each card should have:
+
+- Friendly icon or illustration
+- Short description
+- Hover animation
+- Link to request a quote
+
+Use rounded cards arranged in a responsive grid.
+
+3. ABOUT SECTION
+
+Heading:
+“Family Recipes, Shared with Love”
+
+Create a two-column section with:
+
+- A decorative illustration or image placeholder on one side
+- Business story on the other
+- Mention that Gul Halal Food is family-owned
+- Mention Pakistani culinary tradition
+- Mention serving halal food since 1985
+- Focus on hospitality, care, and family recipes
+
+Do not invent personal names, awards, locations, or certifications.
+
+Add a highlighted handwritten-style quote:
+
+“Every gathering deserves food made with care.”
+
+4. WHY CHOOSE US
+
+Create four value cards:
+
+- Authentic Pakistani Flavor
+- 100% Halal
+- Family-Owned Since 1985
+- Catering Made Personal
+
+Use playful icons and soft alternating background colors.
+
+5. GALLERY
+
+Heading:
+“From Our Kitchen to Your Celebration”
+
+Create a masonry-inspired responsive gallery with temporary image placeholders.
+
+Include categories such as:
+
+- Food
+- Weddings
+- Family Events
+- Catering Setups
+
+Add a lightbox interaction.
+
+Use tasteful skeleton or illustrated placeholders when real photos are unavailable.
+
+6. TESTIMONIALS
+
+Heading:
+“Made with Love, Remembered with Joy”
+
+Create three polished testimonial cards.
+
+Do not fabricate real customer identities. Use clearly editable placeholder testimonials and generic labels such as:
+
+- Wedding Client
+- Family Gathering
+- Community Event Organizer
+
+Include star icons, quotation marks, and gentle card animations.
+
+7. QUOTE CTA
+
+Create a large illustrated call-to-action section.
+
+Heading:
+“Let’s Plan Something Delicious”
+
+Supporting text:
+Invite visitors to share their event date, guest count, and menu needs.
+
+Include buttons:
+
+- Request a Quote
+- Call Us
+
+Do not invent a phone number. Use an obvious editable placeholder.
+
+8. CONTACT AND QUOTE FORM
+
+Create a responsive quote form containing:
+
+- Full name
+- Email
+- Phone
+- Event date
+- Event type
+- Estimated guest count
+- Preferred dishes or menu notes
+- Additional details
+
+Requirements:
+
+- Accessible labels
+- Helpful validation
+- Keyboard-friendly controls
+- Clear error messages
+- Loading state
+- Temporary frontend success confirmation
+- No fake email sending
+- A TODO comment for backend integration
+
+9. FOOTER
+
+Use a deep forest-green footer.
+
+Include:
+
+- Full final logo
+- Short business description
+- Quick navigation
+- Catering links
+- Contact placeholders
+- Social-media placeholders
+- Halal statement
+- Copyright line
+- “Excellence in halal food since 1985”
+
+Add subtle floral line art in the background.
+
+INTERACTIONS AND ANIMATION
+
+Use subtle animation only:
+
+- Gentle fade-and-rise on section entry
+- Soft floating motion for a few hero doodles
+- Small button lift on hover
+- Slight menu-card image scale on hover
+- Animated active-navigation underline
+- Smooth mobile menu transition
+- Soft testimonial carousel movement if a carousel is used
+
+Respect the user’s reduced-motion preference.
+
+Do not use excessive parallax, large spinning objects, or distracting looping animations.
+
+ACCESSIBILITY
+
+Ensure:
+
+- Semantic HTML
+- Proper heading hierarchy
+- Visible keyboard focus states
+- Descriptive alt text
+- Good color contrast
+- Keyboard-accessible navigation and lightbox
+- Form labels are not replaced by placeholders
+- Buttons are actual buttons
+- Links are actual links
+- Mobile menu works with keyboard navigation
+- Reduced-motion support
+
+SEO
+
+Add appropriate metadata:
+
+Page title:
+“Gul Halal Food | Pakistani Halal Catering”
+
+Description:
+“Family-owned Pakistani halal catering for weddings, gatherings, parties, and special events. Excellence in halal food since 1985.”
+
+Add:
+
+- Open Graph metadata
+- Favicons derived from the logo when practical
+- Meaningful image alt text
+- Local-business structured data using placeholders for missing address, phone, and service area
+- No invented business information
+
+CODE QUALITY
+
+Create reusable components such as:
+
+- Navbar
+- MobileMenu
+- Hero
+- TrustFeatures
+- SectionHeading
+- MenuCard
+- ServiceCard
+- ValueCard
+- Gallery
+- TestimonialCard
+- QuoteForm
+- CallToAction
+- Footer
+- DecorativeFlourish
+
+Store editable content in dedicated data files rather than scattering text throughout the components.
+
+Use consistent spacing and design tokens.
+
+Avoid oversized components containing the whole page.
+
+Use responsive images and prevent layout shifts.
+
+Ensure there are no TypeScript errors, broken links, overflow bugs, missing assets, or console warnings.
+
+FINAL QUALITY CHECK
+
+Before considering the work complete:
+
+- Compare the finished hero side by side with the supplied reference
+- Make the desktop hero composition very close to the reference
+- Verify that the final uploaded logo is being used
+- Verify that the logo slogan reads “Excellence in halal food since 1985”
+- Verify that all references say Pakistani, not Afghan
+- Check desktop, tablet, and mobile layouts
+- Check that every navigation link works
+- Check that all buttons have hover, focus, and pressed states
+- Check that the page has no horizontal scrolling
+- Run the project and fix all build errors
+- Keep the code ready for GitHub and future Codex editing
+
+Do not stop to ask for missing phone numbers, addresses, menu prices, or social links. Use clearly labeled placeholders and place all unknown business information in one editable configuration file.
+
+Start by inspecting the two supplied images, then create the website.
