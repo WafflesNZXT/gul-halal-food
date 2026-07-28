@@ -1,12 +1,19 @@
 import React from "react";
-import { CheckCircle2, Home, Heart } from "lucide-react";
+import { Home, Heart } from "lucide-react";
 
 export function TrustFeatures() {
   return (
     <div className="flex flex-col md:flex-row gap-4 mt-8 w-full max-w-2xl">
       <div className="flex items-center gap-3 bg-card/80 backdrop-blur px-4 py-3 rounded-2xl border border-border/50 shadow-sm flex-1">
-        <div className="w-10 h-10 bg-primary text-white rounded-full flex items-center justify-center shrink-0">
-          <CheckCircle2 size={20} />
+        <div className="w-10 h-10 bg-primary text-white rounded-full flex items-center justify-center shrink-0 border border-white/20">
+          <span
+            className="font-bold leading-none select-none"
+            style={{ fontSize: "13px", fontFamily: "serif", letterSpacing: 0 }}
+            aria-label="Halal in Arabic"
+            lang="ar"
+          >
+            حلال
+          </span>
         </div>
         <div className="flex flex-col">
           <span className="font-bold text-sm text-foreground leading-tight">Halal Pakistani Food</span>
