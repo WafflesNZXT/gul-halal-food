@@ -9,16 +9,16 @@ export function MenuCard({ item }: { item: MenuItem }) {
 
   return (
     <div className="bg-card rounded-[2rem] p-6 border border-border shadow-sm transition-transform duration-300 hover:-translate-y-1 flex flex-col items-center text-center gap-4 group">
-      {/* Dish image / emoji fallback */}
-      <div className="w-24 h-24 bg-background rounded-full border border-border flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform duration-300 overflow-hidden">
+      {/* Dish image — no circular background, slightly larger */}
+      <div className="w-32 h-32 flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shrink-0">
         {hasImage ? (
           <img
             src={item.image}
             alt={item.name}
-            className="w-full h-full object-contain"
+            className="w-full h-full object-contain drop-shadow-md"
           />
         ) : (
-          <span className="text-5xl" aria-hidden="true">
+          <span className="text-6xl" aria-hidden="true">
             {item.icon}
           </span>
         )}

@@ -39,22 +39,22 @@ export function Hero() {
             "radial-gradient(ellipse at center, transparent 40%, rgba(15,30,15,0.35) 100%)",
         }}
       />
-      {/* Left text fade: cream-to-transparent so heading pops */}
+      {/* Left text fade: stronger cream so text column is clearly readable */}
       <div
         aria-hidden="true"
-        className="absolute inset-y-0 left-0 z-[3] w-[55%] hidden lg:block"
+        className="absolute inset-y-0 left-0 z-[3] w-[60%] hidden lg:block"
         style={{
           background:
-            "linear-gradient(to right, rgba(255,248,235,0.55) 0%, transparent 100%)",
+            "linear-gradient(to right, rgba(255,248,235,0.82) 0%, rgba(255,248,235,0.45) 65%, transparent 100%)",
         }}
       />
-      {/* Mobile left fade */}
+      {/* Mobile fade: solid at top where text lives, fades to transparent */}
       <div
         aria-hidden="true"
         className="absolute inset-0 z-[3] lg:hidden"
         style={{
           background:
-            "linear-gradient(to bottom, rgba(255,248,235,0.60) 0%, rgba(255,248,235,0.35) 60%, transparent 100%)",
+            "linear-gradient(to bottom, rgba(255,248,235,0.88) 0%, rgba(255,248,235,0.60) 55%, transparent 100%)",
         }}
       />
 
@@ -119,7 +119,7 @@ export function Hero() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={entrance ?? { duration: 0.5, delay: 0.2 }}
-              className="text-lg md:text-xl text-foreground/90 max-w-xl mb-8 leading-relaxed font-sans [text-shadow:0_1px_3px_rgba(255,248,235,0.7)]"
+              className="text-lg md:text-xl text-primary max-w-xl mb-8 leading-relaxed font-sans"
             >
               Delicious Pakistani halal catering for your special moments. From
               family gatherings to big celebrations — we're here to help.

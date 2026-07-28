@@ -28,11 +28,9 @@ export function CartDrawer() {
   const [, navigate] = useLocation();
 
   const allPriced = items.every((i) => typeof i.basePrice === "number");
+  const totalPeople = items.reduce((s, i) => s + i.quantity, 0);
   const subtotal = allPriced
-    ? items.reduce(
-        (sum, i) => sum + (i.basePrice ?? 0) * i.quantity,
-        0
-      )
+    ? items.reduce((sum, i) => sum + (i.basePrice ?? 0) * i.quantity, 0)
     : null;
 
   const handleRequestOrder = () => {
@@ -52,11 +50,7 @@ export function CartDrawer() {
             Your Order{" "}
             {items.length > 0 && (
               <span className="text-sm font-normal text-foreground/60 ml-1">
-                ({items.reduce((s, i) => s + i.quantity, 0)}{" "}
-                {items.reduce((s, i) => s + i.quantity, 0) === 1
-                  ? "item"
-                  : "items"}
-                )
+                ({items.length} {items.length === 1 ? "dish" : "dishes"})
               </span>
             )}
           </SheetTitle>
@@ -76,7 +70,7 @@ export function CartDrawer() {
                 key={cartItemKey(item.config)}
                 item={item}
                 onRemove={() => removeItem(cartItemKey(item.config))}
-                onQtyChange={(delta) =>
+                onPeopleChange={(delta) =>
                   updateQty(cartItemKey(item.config), delta)
                 }
                 onSpiceChange={(level) =>
@@ -144,7 +138,7 @@ export function CartDrawer() {
 type CartLineItemProps = {
   item: CartItem;
   onRemove: () => void;
-  onQtyChange: (delta: number) => void;
+  onPeopleChange: (delta: number) => void;
   onSpiceChange: (level: SpiceLevelValue) => void;
   onProteinChange: (proteinId: string, proteinLabel: string) => void;
 };
@@ -152,13 +146,14 @@ type CartLineItemProps = {
 function CartLineItem({
   item,
   onRemove,
-  onQtyChange,
+  onPeopleChange,
   onSpiceChange,
   onProteinChange,
 }: CartLineItemProps) {
   const menuItem = menu.find((m) => m.id === item.config.menuItemId);
-  const canCustomiseSpice = menuItem?.spiceCustomizable !== false;
+  const canCustomiseSpice = menuItem?.spiceCustomizable !== false && (menuItem?.spiceLevel ?? 0) > 0;
   const proteinOptions = menuItem?.proteinOptions ?? [];
+  const customizationLabel = menuItem?.customizationLabel ?? "Protein";
 
   return (
     <div className="rounded-2xl border border-border bg-background p-4 space-y-3">
@@ -184,9 +179,11 @@ function CartLineItem({
               {item.proteinLabel}
             </p>
           )}
-          <div className="mt-1">
-            <SpiceLevel level={item.config.spiceLevel} />
-          </div>
+          {canCustomiseSpice && (
+            <div className="mt-1">
+              <SpiceLevel level={item.config.spiceLevel} />
+            </div>
+          )}
         </div>
         <button
           onClick={onRemove}
@@ -197,11 +194,11 @@ function CartLineItem({
         </button>
       </div>
 
-      {/* Protein selector (if applicable) */}
+      {/* Protein / style selector (if applicable) */}
       {proteinOptions.length > 0 && (
         <div className="space-y-1">
           <p className="text-xs font-semibold text-foreground/60 uppercase tracking-wide">
-            Protein
+            {customizationLabel}
           </p>
           <div className="flex flex-wrap gap-1.5">
             {proteinOptions.map((opt) => (
@@ -235,23 +232,24 @@ function CartLineItem({
         </div>
       )}
 
-      {/* Quantity + price */}
+      {/* People count + price */}
       <div className="flex items-center justify-between pt-1">
         <div className="flex items-center gap-2">
           <button
-            onClick={() => onQtyChange(-1)}
-            className="w-7 h-7 rounded-full border border-border flex items-center justify-center text-foreground/70 hover:bg-muted transition-colors"
-            aria-label="Decrease quantity"
+            onClick={() => onPeopleChange(-1)}
+            className="w-7 h-7 rounded-full border border-border flex items-center justify-center text-foreground/70 hover:bg-muted transition-colors disabled:opacity-40"
+            aria-label="Decrease people count"
+            disabled={item.quantity <= 1}
           >
             <Minus size={13} />
           </button>
-          <span className="w-5 text-center text-sm font-semibold">
-            {item.quantity}
+          <span className="text-sm font-semibold text-center whitespace-nowrap">
+            {item.quantity} {item.quantity === 1 ? "person" : "people"}
           </span>
           <button
-            onClick={() => onQtyChange(1)}
+            onClick={() => onPeopleChange(1)}
             className="w-7 h-7 rounded-full border border-border flex items-center justify-center text-foreground/70 hover:bg-muted transition-colors"
-            aria-label="Increase quantity"
+            aria-label="Increase people count"
           >
             <Plus size={13} />
           </button>

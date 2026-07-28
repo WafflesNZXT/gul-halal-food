@@ -111,8 +111,8 @@ export function Navbar() {
               className="min-w-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
               aria-label="Gul Halal Food home"
             >
-              <BrandLockup variant="header" className="hidden sm:flex w-[280px]" />
-              <BrandLockup variant="compact" className="sm:hidden" />
+              <BrandLockup variant="header" scrolled={isScrolled} className="hidden sm:flex w-[280px]" />
+              <BrandLockup variant="compact" scrolled={isScrolled} className="sm:hidden" />
             </Link>
 
             <ul className="hidden xl:flex items-center gap-5 2xl:gap-7">

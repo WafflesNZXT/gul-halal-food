@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useRoute } from "wouter";
-import { ArrowLeft, ShoppingBasket, Check } from "lucide-react";
+import { ArrowLeft, ShoppingBasket, Check, Minus, Plus } from "lucide-react";
 import { Layout } from "@/components/Layout";
 import { QuoteCTA } from "@/components/QuoteCTA";
 import { DishImage } from "@/components/DishImage";
@@ -52,6 +52,7 @@ function DishDetailContent({ slug }: { slug: string }) {
   const [selectedSpice, setSelectedSpice] = useState<SpiceLevelValue | null>(
     canCustomiseSpice ? null : defaultSpice
   );
+  const [peopleCount, setPeopleCount] = useState(1);
   const [addedFeedback, setAddedFeedback] = useState(false);
 
   const proteinError = hasProteinOptions && selectedProtein === null;
@@ -70,7 +71,7 @@ function DishDetailContent({ slug }: { slug: string }) {
         proteinChoice: selectedProtein ?? undefined,
         spiceLevel: effectiveSpice,
       },
-      quantity: 1,
+      quantity: peopleCount,
       name: dish.name,
       image: dish.image,
       pricingLabel: dish.pricingLabel ?? dish.price,
@@ -85,6 +86,7 @@ function DishDetailContent({ slug }: { slug: string }) {
   };
 
   const displaySpice = selectedSpice ?? dish.spiceLevel;
+  const customizationLabel = dish.customizationLabel ?? "Choose your protein";
 
   return (
     <Layout>
@@ -120,15 +122,17 @@ function DishDetailContent({ slug }: { slug: string }) {
               </p>
 
               {/* Suggested spice level (informational) */}
-              <div className="mt-7 flex items-center gap-3">
-                <span className="text-sm font-semibold text-foreground/60">
-                  Suggested:
-                </span>
-                <SpiceLevel level={dish.spiceLevel} />
-                <span className="text-sm text-foreground/60">
-                  Spice level {dish.spiceLevel} of 3
-                </span>
-              </div>
+              {dish.spiceLevel > 0 && (
+                <div className="mt-7 flex items-center gap-3">
+                  <span className="text-sm font-semibold text-foreground/60">
+                    Suggested:
+                  </span>
+                  <SpiceLevel level={dish.spiceLevel} />
+                  <span className="text-sm text-foreground/60">
+                    Spice level {dish.spiceLevel} of 3
+                  </span>
+                </div>
+              )}
 
               {/* Spice customisation selector */}
               {canCustomiseSpice && (
@@ -150,11 +154,11 @@ function DishDetailContent({ slug }: { slug: string }) {
                 </div>
               )}
 
-              {/* Protein selector */}
+              {/* Protein / customization selector */}
               {hasProteinOptions && (
                 <div className="mt-5 space-y-2">
                   <p className="text-sm font-semibold text-foreground">
-                    Choose your protein{" "}
+                    {customizationLabel}{" "}
                     <span className="text-destructive" aria-hidden="true">*</span>
                   </p>
                   <div className="flex flex-wrap gap-2">
@@ -175,11 +179,65 @@ function DishDetailContent({ slug }: { slug: string }) {
                   </div>
                   {proteinError && (
                     <p className="text-xs text-destructive" role="alert">
-                      Please choose a protein.
+                      Please make a selection.
                     </p>
                   )}
                 </div>
               )}
+
+              {/* People count stepper */}
+              <div className="mt-5 space-y-2">
+                <label
+                  htmlFor={`people-count-${dish.id}`}
+                  className="text-sm font-semibold text-foreground"
+                >
+                  How many people is this for?
+                </label>
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setPeopleCount((n) => Math.max(1, n - 1))}
+                    className="w-9 h-9 rounded-full border border-border flex items-center justify-center text-foreground/70 hover:bg-muted transition-colors disabled:opacity-40 shrink-0"
+                    aria-label="Decrease people count"
+                    disabled={peopleCount <= 1}
+                  >
+                    <Minus size={14} />
+                  </button>
+                  <div className="flex items-center gap-1.5">
+                    <input
+                      id={`people-count-${dish.id}`}
+                      type="number"
+                      min={1}
+                      value={peopleCount}
+                      onChange={(e) => {
+                        const val = parseInt(e.target.value, 10);
+                        if (!isNaN(val) && val >= 1) setPeopleCount(val);
+                        else if (e.target.value === "") setPeopleCount(1);
+                      }}
+                      onBlur={(e) => {
+                        const val = parseInt(e.target.value, 10);
+                        setPeopleCount(isNaN(val) || val < 1 ? 1 : val);
+                      }}
+                      className="w-16 text-center text-base font-semibold rounded-xl border border-border bg-background px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                      aria-label="Number of people"
+                    />
+                    <span className="text-sm text-foreground/60 whitespace-nowrap">
+                      {peopleCount === 1 ? "person" : "people"}
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setPeopleCount((n) => n + 1)}
+                    className="w-9 h-9 rounded-full border border-border flex items-center justify-center text-foreground/70 hover:bg-muted transition-colors shrink-0"
+                    aria-label="Increase people count"
+                  >
+                    <Plus size={14} />
+                  </button>
+                </div>
+                <p className="text-xs text-foreground/55">
+                  Catering portion sized for this many guests.
+                </p>
+              </div>
 
               {/* Flavor highlights */}
               <div className="mt-7 rounded-2xl border border-border bg-card p-5">

@@ -3,14 +3,20 @@ import { cn } from "@/lib/utils";
 
 type BrandLockupProps = {
   variant?: "header" | "footer" | "compact";
+  scrolled?: boolean;
   className?: string;
 };
 
 const grandmotherCutout = `${import.meta.env.BASE_URL.replace(/\/$/, "")}/brand/gul-grandmother-cutout.webp`;
 
-export function BrandLockup({ variant = "header", className }: BrandLockupProps) {
+export function BrandLockup({ variant = "header", scrolled = false, className }: BrandLockupProps) {
   const isFooter = variant === "footer";
   const isCompact = variant === "compact";
+
+  // When scrolled (dark green navbar): Gul, Halal, Pakistani Catering → white; Food → orange (unchanged)
+  const gulColor = isFooter ? "text-[#FFF8E8]" : scrolled ? "text-white" : "text-primary";
+  const halalColor = isFooter ? "text-[#DDE8C8]" : scrolled ? "text-white" : "text-primary";
+  const taglineColor = isFooter ? "text-[#DDE8C8]/85" : scrolled ? "text-white/90" : "text-primary/70";
 
   return (
     <div className={cn("flex items-center", isCompact ? "gap-1.5" : "gap-2.5", className)}>
@@ -35,10 +41,9 @@ export function BrandLockup({ variant = "header", className }: BrandLockupProps)
         {/* "Gul" — shifted down a touch so the cap-height aligns with "Halal Food" */}
         <span
           className={cn(
-            "font-display font-bold tracking-tight block",
-            isFooter ? "text-[#FFF8E8]" : "text-primary",
+            "font-display font-bold tracking-tight block motion-safe:transition-colors motion-safe:duration-300",
+            gulColor,
             isCompact ? "text-[1.25rem]" : "text-[2.1rem]",
-            /* nudge "Gul" down relative to its line-height so it sits even with the lines below */
             isCompact ? "mt-[1px]" : "mt-[2px]",
           )}
         >
@@ -51,14 +56,14 @@ export function BrandLockup({ variant = "header", className }: BrandLockupProps)
             isCompact ? "text-[0.95rem]" : "text-[1.35rem]",
           )}
         >
-          <span className={isFooter ? "text-[#DDE8C8]" : "text-primary"}>Halal </span>
+          <span className={cn("motion-safe:transition-colors motion-safe:duration-300", halalColor)}>Halal </span>
           <span className="text-secondary">Food</span>
         </span>
 
         <span
           className={cn(
-            "font-bold uppercase tracking-[0.16em] block",
-            isFooter ? "text-[#DDE8C8]/85" : "text-primary/70",
+            "font-bold uppercase tracking-[0.16em] block motion-safe:transition-colors motion-safe:duration-300",
+            taglineColor,
             isCompact ? "text-[0.46rem]" : "text-[0.54rem]",
           )}
         >
