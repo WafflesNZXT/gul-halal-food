@@ -1,8 +1,8 @@
 import { asc, eq } from "drizzle-orm";
 import { randomUUID } from "node:crypto";
-import type { CustomerOrder, CustomerOrderItem, OrderStatus } from "../../src/shared/orders";
-import { getDatabase } from "../db";
-import { orderItems, orders, orderStatusHistory } from "../schema";
+import type { CustomerOrder, CustomerOrderItem, OrderStatus } from "../../src/shared/orders.js";
+import { getDatabase } from "../db.js";
+import { orderItems, orders, orderStatusHistory } from "../schema.js";
 
 export type StoredOrderInput = {
   id: string;

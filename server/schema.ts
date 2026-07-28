@@ -1,5 +1,5 @@
 import { index, integer, jsonb, pgEnum, pgTable, text, timestamp, uniqueIndex } from "drizzle-orm/pg-core";
-import type { OrderStatus } from "../src/shared/orders";
+import type { OrderStatus } from "../src/shared/orders.js";
 
 export const orderStatusEnum = pgEnum("order_status", ["pending", "received", "reviewing", "confirmed", "preparing", "ready", "completed", "cancelled"]);
 export const actorTypeEnum = pgEnum("order_actor_type", ["system", "admin"]);

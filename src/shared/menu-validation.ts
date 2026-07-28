@@ -1,5 +1,5 @@
-import { menu } from "../data/menu";
-import type { CustomerOrderItem, OrderItemInput } from "./orders";
+import { menu } from "../data/menu.js";
+import type { CustomerOrderItem, OrderItemInput } from "./orders.js";
 
 export type MenuValidationIssue = { path: string; message: string };
 

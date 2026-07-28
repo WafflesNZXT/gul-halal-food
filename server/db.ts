@@ -1,8 +1,8 @@
 import { Pool } from "pg";
 import { drizzle } from "drizzle-orm/node-postgres";
-import * as schema from "./schema";
-import { serviceUnavailable } from "./errors";
-import { getMigrationDatabaseUrl, getRuntimeDatabaseUrl } from "./env";
+import * as schema from "./schema.js";
+import { serviceUnavailable } from "./errors.js";
+import { getMigrationDatabaseUrl, getRuntimeDatabaseUrl } from "./env.js";
 
 let runtimePool: Pool | undefined;
 let migrationPool: Pool | undefined;

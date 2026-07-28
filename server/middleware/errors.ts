@@ -1,4 +1,4 @@
-import { AppError } from "../errors";
+import { AppError } from "../errors.js";
 
 export function notFoundApi(_req: any, res: any) {
   return res.status(404).json({ error: { code: "NOT_FOUND", message: "Not found." } });

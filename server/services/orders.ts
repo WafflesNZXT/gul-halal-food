@@ -1,8 +1,8 @@
 import { createHash, randomBytes, randomUUID } from "node:crypto";
-import type { CreateOrderRequest, CreateOrderResponse, CustomerOrder } from "../../src/shared/orders";
-import { validateMenuOrderItems } from "../../src/shared/menu-validation";
-import { AppError, notFound } from "../errors";
-import type { OrderRepository } from "../repositories/orders";
+import type { CreateOrderRequest, CreateOrderResponse, CustomerOrder } from "../../src/shared/orders.js";
+import { validateMenuOrderItems } from "../../src/shared/menu-validation.js";
+import { AppError, notFound } from "../errors.js";
+import type { OrderRepository } from "../repositories/orders.js";
 
 export function hashStatusToken(token: string) {
   return createHash("sha256").update(token).digest("hex");

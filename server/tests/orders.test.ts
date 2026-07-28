@@ -1,13 +1,13 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import type { AddressInfo } from "node:net";
-import { createApp } from "../app";
-import { AppError } from "../errors";
-import type { OrderRepository, StoredOrderInput } from "../repositories/orders";
-import { createOrder, getPublicOrderStatus, hashStatusToken } from "../services/orders";
-import { parseCreateOrder } from "../validation/orders";
-import { getMigrationDatabaseUrl, getPublicBaseUrl, getRuntimeDatabaseUrl } from "../env";
-import type { CreateOrderRequest, CustomerOrder } from "../../src/shared/orders";
+import { createApp } from "../app.js";
+import { AppError } from "../errors.js";
+import type { OrderRepository, StoredOrderInput } from "../repositories/orders.js";
+import { createOrder, getPublicOrderStatus, hashStatusToken } from "../services/orders.js";
+import { parseCreateOrder } from "../validation/orders.js";
+import { getMigrationDatabaseUrl, getPublicBaseUrl, getRuntimeDatabaseUrl } from "../env.js";
+import type { CreateOrderRequest, CustomerOrder } from "../../src/shared/orders.js";
 
 const validPayload: CreateOrderRequest = {
   customerName: "Amina Khan",

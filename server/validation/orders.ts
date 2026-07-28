@@ -1,6 +1,6 @@
 import { z } from "zod";
-import type { CreateOrderRequest } from "../../src/shared/orders";
-import { AppError } from "../errors";
+import type { CreateOrderRequest } from "../../src/shared/orders.js";
+import { AppError } from "../errors.js";
 
 const trimmed = (max: number) => z.string().trim().min(1).max(max);
 const optionalTrimmed = (max: number) => z.string().trim().max(max).optional().transform((value) => value || undefined);

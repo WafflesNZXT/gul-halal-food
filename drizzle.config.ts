@@ -1,5 +1,5 @@
 import { defineConfig } from "drizzle-kit";
-import { getMigrationDatabaseUrl } from "./server/env";
+import { getMigrationDatabaseUrl } from "./server/env.js";
 
 export default defineConfig({
   schema: "./server/schema.ts",

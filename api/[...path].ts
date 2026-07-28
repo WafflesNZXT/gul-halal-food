@@ -1,4 +1,4 @@
-import { createApp } from "../server/app";
+import { createApp } from "../server/app.js";
 
 // Vercel invokes this API catch-all as a Node.js Serverless Function. The
 // standalone listener remains in server/index.ts for local development.

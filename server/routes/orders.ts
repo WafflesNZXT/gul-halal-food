@@ -1,9 +1,9 @@
 import { Router } from "express";
-import { PostgresOrderRepository, type OrderRepository } from "../repositories/orders";
-import { createOrder, getPublicOrderStatus } from "../services/orders";
-import { parseCreateOrder } from "../validation/orders";
-import { orderRateLimit, requireTrustedOrigin } from "../middleware/security";
-import { getPublicBaseUrl } from "../env";
+import { PostgresOrderRepository, type OrderRepository } from "../repositories/orders.js";
+import { createOrder, getPublicOrderStatus } from "../services/orders.js";
+import { parseCreateOrder } from "../validation/orders.js";
+import { orderRateLimit, requireTrustedOrigin } from "../middleware/security.js";
+import { getPublicBaseUrl } from "../env.js";
 
 export function createOrdersRouter(repository: OrderRepository = new PostgresOrderRepository()) {
   const router = Router();

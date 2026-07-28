@@ -15,7 +15,8 @@
     "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.server.json --noEmit",
     "test": "node --import tsx --test server/tests/orders.test.ts src/contexts/cart.test.ts",
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "node --import tsx server/migrate.ts"
+    "db:migrate": "node --import tsx server/migrate.ts",
+    "check:server-imports": "node scripts/check-server-imports.mjs"
   },
   "devDependencies": {
     "@hookform/resolvers": "^3.10.0",

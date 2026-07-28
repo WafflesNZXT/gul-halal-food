@@ -1,9 +1,9 @@
 import path from "node:path";
 import express from "express";
 import helmet from "helmet";
-import { createOrdersRouter } from "./routes/orders";
-import { errorHandler, notFoundApi } from "./middleware/errors";
-import type { OrderRepository } from "./repositories/orders";
+import { createOrdersRouter } from "./routes/orders.js";
+import { errorHandler, notFoundApi } from "./middleware/errors.js";
+import type { OrderRepository } from "./repositories/orders.js";
 
 export function createApp(repository?: OrderRepository) {
   const app = express();

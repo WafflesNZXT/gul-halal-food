@@ -1,6 +1,6 @@
-import "./env";
-import { createApp } from "./app";
-import { getApiPort } from "./env";
+import "./env.js";
+import { createApp } from "./app.js";
+import { getApiPort } from "./env.js";
 
 const port = getApiPort();
 const app = createApp();
