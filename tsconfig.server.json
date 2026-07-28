@@ -1,0 +1,6 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": { "noEmit": true },
+  "include": ["server", "src/shared", "src/data/menu.ts"],
+  "exclude": ["node_modules", "dist"]
+}

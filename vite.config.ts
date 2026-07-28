@@ -6,6 +6,7 @@ import { defineConfig } from "vite";
 
 const rootDir = path.dirname(fileURLToPath(import.meta.url));
 const port = Number(process.env.PORT) || 5173;
+const apiPort = Number(process.env.API_PORT) || 5001;
 
 const replitHosts: string[] = [];
 if (process.env.REPLIT_DEV_DOMAIN) {
@@ -38,6 +39,12 @@ export default defineConfig({
     port,
     host: "0.0.0.0",
     allowedHosts,
+    proxy: {
+      "/api": {
+        target: `http://127.0.0.1:${apiPort}`,
+        changeOrigin: false,
+      },
+    },
   },
 
   preview: {

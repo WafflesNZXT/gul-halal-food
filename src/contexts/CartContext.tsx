@@ -38,11 +38,12 @@ type CartAction =
       newProteinLabel?: string;
     }
   | { type: "UPDATE_SPICE"; key: string; spiceLevel: SpiceLevelValue }
+  | { type: "CLEAR_CART" }
   | { type: "OPEN_CART" }
   | { type: "CLOSE_CART" }
   | { type: "TOGGLE_CART" };
 
-function reducer(state: CartState, action: CartAction): CartState {
+export function cartReducer(state: CartState, action: CartAction): CartState {
   switch (action.type) {
     case "ADD_ITEM": {
       const key = cartItemKey(action.item.config);
@@ -116,7 +117,7 @@ function reducer(state: CartState, action: CartAction): CartState {
       );
       if (!item) return state;
       const newConfig = { ...item.config, spiceLevel: action.spiceLevel };
-      return reducer(state, {
+      return cartReducer(state, {
         type: "UPDATE_CONFIG",
         oldKey: action.key,
         newConfig,
@@ -129,6 +130,8 @@ function reducer(state: CartState, action: CartAction): CartState {
       return { ...state, isOpen: false };
     case "TOGGLE_CART":
       return { ...state, isOpen: !state.isOpen };
+    case "CLEAR_CART":
+      return { items: [], isOpen: false };
 
     default:
       return state;
@@ -188,12 +191,13 @@ type CartContextValue = {
   openCart: () => void;
   closeCart: () => void;
   toggleCart: () => void;
+  clearCart: () => void;
 };
 
 const CartContext = createContext<CartContextValue | null>(null);
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
-  const [state, dispatch] = useReducer(reducer, undefined, loadCart);
+  const [state, dispatch] = useReducer(cartReducer, undefined, loadCart);
 
   useEffect(() => {
     saveCart(state);
@@ -224,6 +228,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const openCart = useCallback(() => dispatch({ type: "OPEN_CART" }), []);
   const closeCart = useCallback(() => dispatch({ type: "CLOSE_CART" }), []);
   const toggleCart = useCallback(() => dispatch({ type: "TOGGLE_CART" }), []);
+  const clearCart = useCallback(() => dispatch({ type: "CLEAR_CART" }), []);
 
   return (
     <CartContext.Provider
@@ -239,6 +244,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         openCart,
         closeCart,
         toggleCart,
+        clearCart,
       }}
     >
       {children}

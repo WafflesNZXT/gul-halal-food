@@ -4,10 +4,18 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite --config vite.config.ts --host 0.0.0.0",
-    "build": "vite build --config vite.config.ts",
+    "dev": "node node_modules/concurrently/dist/bin/index.js --kill-others-on-fail \"npm run dev:frontend\" \"npm run dev:server\"",
+    "dev:frontend": "vite --config vite.config.ts --host 0.0.0.0",
+    "dev:server": "node --watch --import tsx server/index.ts",
+    "build": "npm run build:frontend && npm run build:server",
+    "build:frontend": "vite build --config vite.config.ts",
+    "build:server": "tsc -p tsconfig.server.json --noEmit",
     "serve": "vite preview --config vite.config.ts --host 0.0.0.0",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "start": "node --import tsx server/index.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.server.json --noEmit",
+    "test": "node --import tsx --test server/tests/orders.test.ts src/contexts/cart.test.ts",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "node --import tsx server/migrate.ts"
   },
   "devDependencies": {
     "@hookform/resolvers": "^3.10.0",
@@ -41,14 +49,18 @@
     "@tailwindcss/typography": "^0.5.15",
     "@tailwindcss/vite": "latest",
     "@tanstack/react-query": "latest",
+    "@types/express": "^5.0.6",
     "@types/node": "latest",
+    "@types/pg": "^8.20.0",
     "@types/react": "latest",
     "@types/react-dom": "latest",
     "@vitejs/plugin-react": "latest",
     "class-variance-authority": "latest",
     "clsx": "latest",
     "cmdk": "^1.1.1",
+    "concurrently": "^10.0.4",
     "date-fns": "^3.6.0",
+    "drizzle-kit": "^0.31.10",
     "embla-carousel-react": "^8.6.0",
     "framer-motion": "latest",
     "input-otp": "^1.4.2",
@@ -72,6 +84,12 @@
     "zod": "latest"
   },
   "dependencies": {
-    "sharp": "^0.35.3"
+    "drizzle-orm": "^0.45.2",
+    "express": "^5.2.1",
+    "express-rate-limit": "^8.6.1",
+    "helmet": "^8.3.0",
+    "pg": "^8.22.0",
+    "sharp": "^0.35.3",
+    "tsx": "^4.21.0"
   }
 }

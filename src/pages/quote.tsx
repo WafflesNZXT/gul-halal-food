@@ -7,7 +7,7 @@ import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { UtensilsCrossed, Trash2 } from "lucide-react";
-import { submitOrder } from "@/lib/order";
+import { clearCartAfterSuccessfulSubmission, submitOrder } from "@/lib/order";
 import type { Order, OrderSubmissionResult } from "@/lib/order";
 import { useCart, cartItemKey } from "@/contexts/CartContext";
 import { SpiceLevel } from "@/components/SpiceLevel";
@@ -20,8 +20,9 @@ const formSchema = z.object({
   phone: z.string().min(10, "Please enter a valid phone number"),
   eventDate: z.string().min(1, "Please select an event date"),
   eventType: z.string().min(1, "Please select an event type"),
-  venue: z.string().optional(),
+  venue: z.string().min(2, "Please enter a venue or city"),
   dietaryNeeds: z.string().optional(),
+  website: z.string().optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -62,12 +63,7 @@ export default function Quote() {
   const [submissionResult, setSubmissionResult] =
     useState<OrderSubmissionResult | null>(null);
 
-  const requestedDish =
-    typeof window !== "undefined"
-      ? new URLSearchParams(window.location.search).get("dish")
-      : null;
-
-  const { items, removeItem, updateQty, itemCount } = useCart();
+  const { items, removeItem, updateQty, itemCount, clearCart } = useCart();
 
   const {
     register,
@@ -81,28 +77,25 @@ export default function Quote() {
   });
 
   const onSubmit = async (data: FormValues) => {
-    const orderItems =
-      items.length > 0
-        ? items.map((item) => ({
-            dishSlug: item.config.menuItemId,
-            dishName: buildDishName(item),
-          }))
-        : requestedDish
-        ? [
-            {
-              dishSlug: requestedDish
-                .toLowerCase()
-                .replace(/[^a-z0-9]+/g, "-")
-                .replace(/(^-|-$)/g, ""),
-              dishName: requestedDish,
-            },
-          ]
-        : [];
-
     const result = await submitOrder({
-      ...data,
-      items: orderItems,
+      customerName: data.fullName,
+      customerEmail: data.email,
+      customerPhone: data.phone,
+      eventDate: data.eventDate,
+      eventType: data.eventType,
+      venue: data.venue,
+      dietaryNeeds: data.dietaryNeeds,
+      website: data.website,
+      items: items.map((item) => ({ ...item.config, peopleCount: item.quantity })),
     });
+    if (result.status === "success") {
+      clearCartAfterSuccessfulSubmission(result, clearCart);
+      try {
+        localStorage.setItem("gul-latest-order", JSON.stringify({ reference: result.order.reference, statusUrl: result.order.statusUrl }));
+      } catch {
+        // Convenience-only storage; it contains no customer contact information.
+      }
+    }
     setSubmissionResult(result);
   };
 
@@ -122,9 +115,6 @@ export default function Quote() {
             {submissionResult?.status === "success" ? (
               <OrderConfirmation
                 order={submissionResult.order}
-                receiptUrl={submissionResult.receiptUrl}
-                emailStatusUrl={submissionResult.emailStatusUrl}
-                statusUrl={submissionResult.statusUrl}
               />
             ) : (
               <>
@@ -142,16 +132,6 @@ export default function Quote() {
                   </div>
                 </div>
 
-                {submissionResult?.status === "not_configured" && (
-                  <div
-                    role="status"
-                    className="mb-8 rounded-2xl border border-secondary/30 bg-secondary/10 p-4 text-sm text-foreground"
-                  >
-                    Online ordering is not connected yet. Your information has
-                    not been sent, but this page is ready for future order
-                    submission.
-                  </div>
-                )}
                 {submissionResult?.status === "error" && (
                   <div
                     role="alert"
@@ -321,14 +301,15 @@ export default function Quote() {
                           htmlFor="venue"
                           className="text-sm font-semibold text-foreground"
                         >
-                          Venue / City (If known)
+                          Venue / City *
                         </label>
                         <Input
                           id="venue"
                           placeholder="e.g. Community Center, San Jose"
-                          className="h-12 rounded-xl bg-background border-border md:w-1/2"
+                          className={`h-12 rounded-xl bg-background border-border md:w-1/2 ${errors.venue ? "border-destructive" : ""}`}
                           {...register("venue")}
                         />
+                        {errors.venue && <p className="text-destructive text-sm mt-1">{errors.venue.message}</p>}
                       </div>
                     </div>
                   </div>
@@ -366,6 +347,7 @@ export default function Quote() {
                       {itemCount > 0 ? "Request This Order" : "Place Order"}
                     </Button>
                   </div>
+                  <input tabIndex={-1} autoComplete="off" aria-hidden="true" className="hidden" {...register("website")} />
                 </form>
               </>
             )}
@@ -601,23 +583,12 @@ function CartSummaryLine({
 
 // ─── Order confirmation ───────────────────────────────────────────────────────
 
-function OrderConfirmation({
-  order,
-  receiptUrl,
-  emailStatusUrl,
-  statusUrl,
-}: {
-  order: Order;
-  receiptUrl?: string;
-  emailStatusUrl?: string;
-  statusUrl?: string;
-}) {
-  const hasFollowUp = Boolean(receiptUrl || emailStatusUrl || statusUrl);
+function OrderConfirmation({ order }: { order: Order & { statusUrl: string } }) {
   return (
     <div className="py-12 text-center">
       <h2 className="text-4xl text-primary">Thank you</h2>
       <p className="mx-auto mt-4 max-w-lg text-foreground/75">
-        Your order request has been received.
+        Your order request has been received. Final availability and pricing will be confirmed separately.
       </p>
       <div className="mx-auto mt-8 max-w-lg rounded-2xl border border-border bg-background p-5 text-left space-y-2">
         <p>
@@ -632,34 +603,13 @@ function OrderConfirmation({
         {order.items.length > 0 && (
           <p>
             <strong>Dishes:</strong>{" "}
-            {order.items.map((item) => item.dishName).join(", ")}
+            {order.items.map((item) => item.name).join(", ")}
           </p>
         )}
       </div>
-      {hasFollowUp ? (
-        <div className="mt-8 flex flex-wrap justify-center gap-3">
-          {receiptUrl && (
-            <Button asChild>
-              <a href={receiptUrl}>Email receipt</a>
-            </Button>
-          )}
-          {emailStatusUrl && (
-            <Button asChild>
-              <a href={emailStatusUrl}>Email order status page</a>
-            </Button>
-          )}
-          {statusUrl && (
-            <Button asChild>
-              <a href={statusUrl}>View order status</a>
-            </Button>
-          )}
-        </div>
-      ) : (
-        <p className="mt-8 text-sm text-foreground/60">
-          Email receipt and order-status actions are available after online
-          ordering is connected.
-        </p>
-      )}
+      <div className="mt-8 flex justify-center">
+        <Button asChild><a href={order.statusUrl}>View order status</a></Button>
+      </div>
     </div>
   );
 }
