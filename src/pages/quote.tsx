@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Layout } from "@/components/Layout";
 import { PageHeader } from "@/components/PageHeader";
 import { useForm } from "react-hook-form";
@@ -388,6 +388,22 @@ function CartSummaryLine({
 }) {
   const menuItem = menu.find((m) => m.id === item.config.menuItemId);
 
+  // Local input state so user can type freely; committed on blur / Enter
+  const [inputVal, setInputVal] = useState(String(item.quantity));
+  useEffect(() => {
+    setInputVal(String(item.quantity));
+  }, [item.quantity]);
+
+  const commitInput = () => {
+    const parsed = parseInt(inputVal, 10);
+    if (!isNaN(parsed) && parsed >= 1) {
+      const delta = parsed - item.quantity;
+      if (delta !== 0) onQtyChange(delta);
+    } else {
+      setInputVal(String(item.quantity)); // reset invalid
+    }
+  };
+
   // Build extras display
   const extrasLines: string[] = [];
   if (item.config.extras && menuItem?.extraOptions) {
@@ -403,77 +419,97 @@ function CartSummaryLine({
     }
   }
 
+  const showSpice =
+    menuItem?.spiceCustomizable !== false && (menuItem?.spiceLevel ?? 0) > 0;
+
   return (
-    <div className="flex items-center gap-3 rounded-xl border border-border bg-background px-4 py-3">
-      {item.image && (
-        <img
-          src={item.image}
-          alt={item.name}
-          className="w-10 h-10 rounded-lg object-contain bg-muted shrink-0"
-        />
-      )}
-      <div className="flex-1 min-w-0">
-        <p className="text-sm font-semibold text-foreground truncate">
-          {item.name}
-          {item.proteinLabel && (
-            <span className="font-normal text-foreground/60">
-              {" "}
-              ({item.proteinLabel})
-            </span>
-          )}
-        </p>
-        {extrasLines.length > 0 && (
-          <p className="text-xs text-foreground/55 mt-0.5">
-            {extrasLines.join(" · ")}
-          </p>
+    <div className="rounded-xl border border-border bg-background px-4 py-3 space-y-2.5">
+      {/* Row 1: image · name/extras/spice · trash */}
+      <div className="flex items-start gap-3">
+        {item.image && (
+          <img
+            src={item.image}
+            alt={item.name}
+            className="w-10 h-10 object-contain shrink-0 mt-0.5"
+          />
         )}
-        <div className="flex items-center gap-2 mt-0.5">
-          {(menuItem?.spiceCustomizable !== false && (menuItem?.spiceLevel ?? 0) > 0) && (
-            <>
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-semibold text-foreground leading-snug">
+            {item.name}
+            {item.proteinLabel && (
+              <span className="font-normal text-foreground/60">
+                {" "}({item.proteinLabel})
+              </span>
+            )}
+          </p>
+          {extrasLines.length > 0 && (
+            <p className="text-xs text-foreground/55 mt-0.5">
+              {extrasLines.join(" · ")}
+            </p>
+          )}
+          {showSpice && (
+            <div className="flex items-center gap-1.5 mt-0.5">
               <SpiceLevel level={item.config.spiceLevel} />
               <span className="text-xs text-foreground/50">
                 {["", "Mild", "Medium", "Hot"][item.config.spiceLevel]} spice
               </span>
-            </>
+            </div>
           )}
         </div>
-      </div>
-      <div className="flex items-center gap-2 shrink-0">
-        <button
-          type="button"
-          onClick={() => onQtyChange(-1)}
-          className="w-6 h-6 rounded-full border border-border flex items-center justify-center text-xs text-foreground/70 hover:bg-muted"
-          aria-label="Decrease quantity"
-        >
-          −
-        </button>
-        <span className="text-sm font-semibold w-10 text-center whitespace-nowrap">
-          {item.quantity} {item.quantity === 1 ? "person" : "people"}
-        </span>
-        <button
-          type="button"
-          onClick={() => onQtyChange(1)}
-          className="w-6 h-6 rounded-full border border-border flex items-center justify-center text-xs text-foreground/70 hover:bg-muted"
-          aria-label="Increase quantity"
-        >
-          +
-        </button>
         <button
           type="button"
           onClick={onRemove}
-          className="ml-1 text-foreground/40 hover:text-destructive"
+          className="text-foreground/35 hover:text-destructive transition-colors mt-0.5 shrink-0 cursor-pointer"
           aria-label={`Remove ${item.name}`}
         >
-          <Trash2 size={14} />
+          <Trash2 size={15} />
         </button>
       </div>
-      {typeof item.basePrice === "number" ? (
-        <span className="text-sm font-semibold text-primary shrink-0">
-          ${(item.basePrice * item.quantity).toFixed(2)}
-        </span>
-      ) : (
-        <span className="text-xs text-foreground/40 shrink-0">Pricing pending</span>
-      )}
+
+      {/* Row 2: stepper with typed input · price */}
+      <div className="flex items-center justify-between gap-3 pl-[52px]">
+        {/* − input + stepper */}
+        <div className="flex items-center gap-1.5">
+          <button
+            type="button"
+            onClick={() => onQtyChange(-1)}
+            className="w-7 h-7 rounded-full border border-border flex items-center justify-center text-sm text-foreground/70 hover:bg-muted transition-colors cursor-pointer"
+            aria-label="Decrease people count"
+          >
+            −
+          </button>
+          <input
+            type="number"
+            min={1}
+            value={inputVal}
+            onChange={(e) => setInputVal(e.target.value)}
+            onBlur={commitInput}
+            onKeyDown={(e) => e.key === "Enter" && commitInput()}
+            className="w-12 h-7 rounded-lg border border-border bg-background text-center text-sm font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+            aria-label="Number of people"
+          />
+          <span className="text-sm text-foreground/60 whitespace-nowrap">
+            {parseInt(inputVal, 10) === 1 ? "person" : "people"}
+          </span>
+          <button
+            type="button"
+            onClick={() => onQtyChange(1)}
+            className="w-7 h-7 rounded-full border border-border flex items-center justify-center text-sm text-foreground/70 hover:bg-muted transition-colors cursor-pointer"
+            aria-label="Increase people count"
+          >
+            +
+          </button>
+        </div>
+
+        {/* Price */}
+        {typeof item.basePrice === "number" ? (
+          <span className="text-sm font-semibold text-primary shrink-0">
+            ${(item.basePrice * item.quantity).toFixed(2)}
+          </span>
+        ) : (
+          <span className="text-xs text-foreground/40 shrink-0">Pricing pending</span>
+        )}
+      </div>
     </div>
   );
 }
