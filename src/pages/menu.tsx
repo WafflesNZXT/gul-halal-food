@@ -163,16 +163,16 @@ function MobileMenuRow({ item }: { item: MenuItem }) {
       aria-label={`View ${item.name}`}
       className="flex items-center gap-3 px-4 py-3 active:bg-muted/60 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary"
     >
-      {/* Circular dish image */}
-      <div className="w-12 h-12 rounded-full bg-muted/30 border border-border/50 overflow-hidden shrink-0 flex items-center justify-center">
+      {/* Dish image — no border/circle, sits flush left */}
+      <div className="w-12 h-12 shrink-0 flex items-center justify-center -ml-1">
         {item.image ? (
           <img
             src={item.image}
             alt=""
-            className="w-11 h-11 object-contain"
+            className="w-12 h-12 object-contain drop-shadow-sm"
           />
         ) : (
-          <span className="text-xl" aria-hidden="true">{item.icon}</span>
+          <span className="text-2xl" aria-hidden="true">{item.icon}</span>
         )}
       </div>
 
