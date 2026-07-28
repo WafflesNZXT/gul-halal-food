@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Menu, X, ShoppingBasket } from "lucide-react";
 import { Link, useLocation } from "wouter";
@@ -212,53 +213,69 @@ export function Navbar() {
         </div>
       </header>
 
-      {mobileMenuOpen && (
-        <div
-          id="mobile-navigation"
-          ref={mobileMenuRef}
-          role="dialog"
-          aria-modal="true"
-          aria-label="Mobile navigation"
-          onKeyDown={trapMobileMenuFocus}
-          className="fixed inset-0 z-40 bg-background/95 backdrop-blur-sm xl:hidden pt-24 px-6 pb-6 flex flex-col h-[100dvh]"
-        >
-          <ul className="flex flex-col gap-5 items-center justify-center flex-1">
-            {navLinks.map((link) => {
-              const isActive = location === link.href;
-              return (
-                <li key={link.name}>
-                  <Link
-                    href={link.href}
-                    className={`rounded-lg px-3 py-1 text-2xl font-display focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
-                      isActive ? "text-primary" : "text-foreground hover:text-primary"
-                    }`}
-                    onClick={() => {
-                      scrollActiveLinkToTop(link.href);
-                      closeMobileMenu();
-                    }}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div
+            id="mobile-navigation"
+            ref={mobileMenuRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Mobile navigation"
+            onKeyDown={trapMobileMenuFocus}
+            initial={{ opacity: 0, y: -12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -12 }}
+            transition={{ duration: 0.22, ease: "easeOut" }}
+            className="fixed inset-0 z-40 bg-background/95 backdrop-blur-sm xl:hidden pt-24 px-6 pb-6 flex flex-col h-[100dvh]"
+          >
+            <ul className="flex flex-col gap-5 items-center justify-center flex-1">
+              {navLinks.map((link, idx) => {
+                const isActive = location === link.href;
+                return (
+                  <motion.li
+                    key={link.name}
+                    initial={{ opacity: 0, y: -8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.18, delay: 0.06 + idx * 0.05, ease: "easeOut" }}
                   >
-                    {link.name}
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-          <div className="pb-8 flex justify-center">
-            <Link
-              href="/quote"
-              onClick={closeMobileMenu}
-              className="w-full max-w-sm"
+                    <Link
+                      href={link.href}
+                      className={`rounded-lg px-3 py-1 text-2xl font-display focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
+                        isActive ? "text-primary" : "text-foreground hover:text-primary"
+                      }`}
+                      onClick={() => {
+                        scrollActiveLinkToTop(link.href);
+                        closeMobileMenu();
+                      }}
+                    >
+                      {link.name}
+                    </Link>
+                  </motion.li>
+                );
+              })}
+            </ul>
+            <motion.div
+              className="pb-8 flex justify-center"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.18, delay: 0.28, ease: "easeOut" }}
             >
-              <Button
-                size="lg"
-                className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90 font-bold px-8 w-full text-lg py-6 shadow-md cursor-pointer"
+              <Link
+                href="/quote"
+                onClick={closeMobileMenu}
+                className="w-full max-w-sm"
               >
-                Request a Quote
-              </Button>
-            </Link>
-          </div>
-        </div>
-      )}
+                <Button
+                  size="lg"
+                  className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90 font-bold px-8 w-full text-lg py-6 shadow-md cursor-pointer"
+                >
+                  Request a Quote
+                </Button>
+              </Link>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 }
