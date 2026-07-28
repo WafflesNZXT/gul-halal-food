@@ -1,5 +1,16 @@
 import rateLimit from "express-rate-limit";
 
+type ProxyConfigurableApp = { set(name: "trust proxy", value: number): unknown };
+
+/**
+ * Vercel places Functions behind one trusted edge proxy. Restrict trust to
+ * that single hop only in Vercel so direct/local requests cannot spoof a
+ * client IP through X-Forwarded-For.
+ */
+export function configureProxyTrust(app: ProxyConfigurableApp, environment: NodeJS.ProcessEnv = process.env) {
+  if (environment.VERCEL) app.set("trust proxy", 1);
+}
+
 function configuredOrigins() {
   const values = [process.env.APP_BASE_URL, process.env.REPLIT_DEV_DOMAIN && `https://${process.env.REPLIT_DEV_DOMAIN}`];
   if (process.env.REPLIT_DOMAINS) {

@@ -3,10 +3,12 @@ import express from "express";
 import helmet from "helmet";
 import { createOrdersRouter } from "./routes/orders.js";
 import { errorHandler, notFoundApi } from "./middleware/errors.js";
+import { configureProxyTrust } from "./middleware/security.js";
 import type { OrderRepository } from "./repositories/orders.js";
 
 export function createApp(repository?: OrderRepository) {
   const app = express();
+  configureProxyTrust(app);
   app.disable("x-powered-by");
   app.use(helmet({ contentSecurityPolicy: false, crossOriginEmbedderPolicy: false }));
   app.use(express.json({ limit: "100kb", strict: true }));

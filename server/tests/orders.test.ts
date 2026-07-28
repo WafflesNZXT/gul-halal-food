@@ -7,6 +7,7 @@ import type { OrderRepository, StoredOrderInput } from "../repositories/orders.j
 import { createOrder, getPublicOrderStatus, hashStatusToken } from "../services/orders.js";
 import { parseCreateOrder } from "../validation/orders.js";
 import { getMigrationDatabaseUrl, getPublicBaseUrl, getRuntimeDatabaseUrl } from "../env.js";
+import { configureProxyTrust } from "../middleware/security.js";
 import type { CreateOrderRequest, CustomerOrder } from "../../src/shared/orders.js";
 
 const validPayload: CreateOrderRequest = {
@@ -87,6 +88,21 @@ test("invalid status tokens get the same safe not-found response", async () => {
   await assert.rejects(() => getPublicOrderStatus(repository, "a".repeat(43)), (error: unknown) => error instanceof AppError && error.statusCode === 404 && error.message === "Order not found.");
 });
 
+test("correctly formatted missing status tokens return Express's safe JSON 404", async () => {
+  const app = createApp(new MemoryOrders());
+  const server = await new Promise<any>((resolve) => {
+    const instance = app.listen(0, "127.0.0.1", () => resolve(instance));
+  });
+  try {
+    const port = (server.address() as AddressInfo).port;
+    const response = await fetch(`http://127.0.0.1:${port}/api/orders/status/${"A".repeat(43)}`);
+    assert.equal(response.status, 404);
+    assert.deepEqual(await response.json(), { error: { code: "NOT_FOUND", message: "Order not found." } });
+  } finally {
+    await new Promise<void>((resolve) => server.close(() => resolve()));
+  }
+});
+
 test("database failures receive a safe API response", async () => {
   const repository = new MemoryOrders();
   repository.failCreates = true;
@@ -153,4 +169,14 @@ test("public status links use configured, Vercel, or current request origins wit
 
   const result = await createOrder(new MemoryOrders(), parseCreateOrder(validPayload), { publicBaseUrl: "https://catering.example.com" });
   assert.match(result.statusUrl, /^https:\/\/catering\.example\.com\/order-status\/[A-Za-z0-9_-]{43}$/);
+});
+
+test("Vercel trusts exactly one proxy hop for rate-limit client IPs", () => {
+  const vercelSettings: number[] = [];
+  configureProxyTrust({ set: (_name, value) => { vercelSettings.push(value); } }, { VERCEL: "1" });
+  assert.deepEqual(vercelSettings, [1]);
+
+  const localSettings: number[] = [];
+  configureProxyTrust({ set: (_name, value) => { localSettings.push(value); } }, {});
+  assert.deepEqual(localSettings, []);
 });

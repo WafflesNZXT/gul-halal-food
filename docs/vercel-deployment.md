@@ -6,6 +6,12 @@ are served by Vercel, not by Express. The SPA rewrite in `vercel.json` keeps
 deep links such as `/menu/chicken-biryani`, `/quote`, and
 `/order-status/:token` working; Vercel Functions take precedence for `/api/*`.
 
+`api/orders/status/[token].ts` is an explicit Vercel Function entrypoint for
+the deeper customer-status API path. It delegates to the same Express app as
+the catch-all entrypoint, so token validation, hashing, and safe API errors
+remain centralized. Run `npm run check:vercel-status-route` in CI or before a
+deployment to guard this filesystem route.
+
 ## Local development
 
 1. Copy `.env.example` to `.env` and set `DATABASE_URL` to a Neon pooled URL.
