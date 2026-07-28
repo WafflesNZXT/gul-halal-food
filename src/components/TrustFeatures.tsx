@@ -9,7 +9,7 @@ export function TrustFeatures() {
           <CheckCircle2 size={20} />
         </div>
         <div className="flex flex-col">
-          <span className="font-bold text-sm text-foreground leading-tight">100% Halal</span>
+          <span className="font-bold text-sm text-foreground leading-tight">Halal Pakistani Food</span>
           <span className="text-xs text-foreground/70 leading-tight">Prepared with care</span>
         </div>
       </div>

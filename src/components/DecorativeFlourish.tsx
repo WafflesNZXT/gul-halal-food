@@ -20,8 +20,8 @@ export function DecorativeFlourish({ className }: { className?: string }) {
 
 export function WaveDivider({ className }: { className?: string }) {
   return (
-    <svg className={cn("w-full block", className)} viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
-      <path d="M0 0L48 10.7C96 21.3 192 42.7 288 58.7C384 74.7 480 85.3 576 80C672 74.7 768 53.3 864 48C960 42.7 1056 53.3 1152 64C1248 74.7 1344 85.3 1392 90.7L1440 96V120H1392C1344 120 1248 120 1152 120C1056 120 960 120 864 120C768 120 672 120 576 120C480 120 384 120 288 120C192 120 96 120 48 120H0V0Z" fill="currentColor"/>
+    <svg className={cn("w-full block", className)} viewBox="0 0 1440 160" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+      <path d="M0 33c73 4 118 33 194 39 95 8 148-26 241-21 76 4 120 36 203 29 95-8 137-56 234-51 88 5 129 42 213 39 101-4 175-51 355-21v113H0V33Z" fill="currentColor"/>
     </svg>
   );
 }

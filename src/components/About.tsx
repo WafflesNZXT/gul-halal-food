@@ -1,5 +1,8 @@
 import React from "react";
 import { SectionHeading } from "./SectionHeading";
+import { Link } from "wouter";
+
+const familyPackingPhoto = `${import.meta.env.BASE_URL.replace(/\/$/, "")}/images/about/grandparents-packing-naan.webp`;
 
 export function About() {
   return (
@@ -11,15 +14,11 @@ export function About() {
         <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
           
           <div className="w-full lg:w-1/2">
-            <div className="relative w-full max-w-md mx-auto aspect-[3/4] bg-card border-8 border-card shadow-2xl rounded-t-full rounded-b-2xl overflow-hidden group">
-              <div className="absolute inset-0 bg-muted/30 flex items-center justify-center p-8 text-center border border-border border-dashed m-4 rounded-t-[180px] rounded-b-lg group-hover:bg-muted/40 transition-colors">
-                <div className="flex flex-col items-center gap-4 text-primary opacity-60">
-                  <svg className="w-16 h-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                  </svg>
-                  <p className="font-display text-xl">Generations of culinary heritage</p>
-                </div>
+            <div className="relative mx-auto w-full max-w-2xl overflow-hidden rounded-t-[42%] rounded-b-3xl border-2 border-primary/35 bg-card p-2 shadow-xl">
+              <div className="relative aspect-[16/10] overflow-hidden rounded-t-[40%] rounded-b-2xl">
+                <img src={familyPackingPhoto} alt="Family members packing naan for Gul Halal Food catering orders in their kitchen." className="h-full w-full object-cover object-[52%_48%]" />
               </div>
+              <div aria-hidden="true" className="absolute -right-2 -top-2 text-secondary/80"><svg className="h-10 w-10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C12 2 12 10 20 12C20 12 12 14 12 22C12 22 12 14 4 12C4 12 12 10 12 2Z" /></svg></div>
             </div>
           </div>
 
@@ -30,22 +29,10 @@ export function About() {
             />
             
             <div className="space-y-4 text-foreground/80 text-lg leading-relaxed">
-              <p>
-                Since 1985, Gul Halal Food has been a cornerstone of our community's celebrations. What started as a small family kitchen sharing traditional recipes with neighbors has grown into a beloved catering service.
-              </p>
-              <p>
-                We believe that food is more than just sustenance—it's a way to show care, hospitality, and love. Every dish we prepare is rooted in authentic Pakistani culinary tradition, using the same spice blends and slow-cooking methods our grandparents taught us.
-              </p>
-              <p>
-                Whether we're serving 50 people or 500, we never compromise on quality or our 100% halal commitment. When you choose us for your event, you're not just getting a caterer; you're inviting our family to cook for yours.
-              </p>
+              <p>Gul Halal Food is a family-owned Pakistani halal caterer, sharing food made for gatherings and celebrations.</p>
+              <p>Since 1985, our kitchen has brought familiar Pakistani flavors to the table with care.</p>
             </div>
-
-            <div className="bg-card p-6 rounded-2xl border-l-4 border-secondary mt-8 shadow-sm">
-              <p className="font-display text-2xl text-primary italic">
-                "Every gathering deserves food made with care."
-              </p>
-            </div>
+            <Link href="/about" className="inline-flex font-bold text-primary underline-offset-4 hover:text-secondary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary">Read Our Story →</Link>
           </div>
           
         </div>

@@ -2,6 +2,7 @@ import React from "react";
 import { SectionHeading } from "./SectionHeading";
 import { ServiceCard } from "./ServiceCard";
 import { services } from "@/data/services";
+import { Link } from "wouter";
 
 export function CateringServices() {
   return (
@@ -18,6 +19,7 @@ export function CateringServices() {
             <ServiceCard key={service.id} service={service} />
           ))}
         </div>
+        <div className="mt-10 text-center"><Link href="/catering" className="font-bold text-primary underline-offset-4 hover:text-secondary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary">Explore Catering Services →</Link></div>
       </div>
     </section>
   );
