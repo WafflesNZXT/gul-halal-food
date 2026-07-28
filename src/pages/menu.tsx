@@ -101,16 +101,45 @@ export default function Menu() {
           </div>
 
           {/* ── DESKTOP / tablet grid (sm+) ────────────────────────────────── */}
-          <div className="hidden sm:grid sm:grid-cols-2 sm:gap-6 lg:grid-cols-3 lg:gap-8">
-            {filteredMenu.map((item, idx) => (
-              <Reveal key={item.id} delay={Math.min(idx * 0.05, 0.3)}>
-                <MenuCard item={item} />
-              </Reveal>
-            ))}
+          <div className="hidden sm:block">
+            {activeCategory === "All" ? (
+              // Grouped by category with section headers
+              <div className="space-y-12">
+                {mobileGroups.map((group) => (
+                  <div key={group.category}>
+                    {/* Section divider */}
+                    <div className="flex items-center gap-4 mb-8">
+                      <div className="h-px flex-1 bg-border" />
+                      <span className="text-xs font-bold uppercase tracking-widest text-primary/60 shrink-0">
+                        {group.category}
+                      </span>
+                      <div className="h-px flex-1 bg-border" />
+                    </div>
 
-            {filteredMenu.length === 0 && (
-              <div className="col-span-full py-20 text-center text-foreground/60 text-lg">
-                No items found in this category yet.
+                    <div className="grid sm:grid-cols-2 sm:gap-6 lg:grid-cols-3 lg:gap-8">
+                      {group.items.map((item, idx) => (
+                        <Reveal key={item.id} delay={Math.min(idx * 0.05, 0.2)}>
+                          <MenuCard item={item} />
+                        </Reveal>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              // Single filtered category — flat grid, no header
+              <div className="grid sm:grid-cols-2 sm:gap-6 lg:grid-cols-3 lg:gap-8">
+                {filteredMenu.map((item, idx) => (
+                  <Reveal key={item.id} delay={Math.min(idx * 0.05, 0.3)}>
+                    <MenuCard item={item} />
+                  </Reveal>
+                ))}
+
+                {filteredMenu.length === 0 && (
+                  <div className="col-span-full py-20 text-center text-foreground/60 text-lg">
+                    No items found in this category yet.
+                  </div>
+                )}
               </div>
             )}
           </div>
