@@ -70,5 +70,8 @@
     "vite": "latest",
     "wouter": "^3.3.5",
     "zod": "latest"
+  },
+  "dependencies": {
+    "sharp": "^0.35.3"
   }
 }

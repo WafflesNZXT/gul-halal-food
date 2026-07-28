@@ -36,13 +36,13 @@ export function Footer() {
               Authentic Pakistani halal catering for your most cherished moments. Bringing family recipes to your table since 1985.
             </p>
             <div className="flex gap-4">
-              {config.social.facebook && <a href={config.social.facebook} className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-secondary transition-colors" aria-label="Facebook">
+              {config.social.facebook && <a href={config.social.facebook} className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-secondary transition-colors cursor-pointer" aria-label="Facebook">
                 <FaFacebookF size={20} className="text-white" />
               </a>}
-              {config.social.instagram && <a href={config.social.instagram} className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-secondary transition-colors" aria-label="Instagram">
+              {config.social.instagram && <a href={config.social.instagram} className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-secondary transition-colors cursor-pointer" aria-label="Instagram">
                 <FaInstagram size={20} className="text-white" />
               </a>}
-              {config.social.twitter && <a href={config.social.twitter} className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-secondary transition-colors" aria-label="Twitter">
+              {config.social.twitter && <a href={config.social.twitter} className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-secondary transition-colors cursor-pointer" aria-label="Twitter">
                 <FaTwitter size={20} className="text-white" />
               </a>}
             </div>
@@ -60,14 +60,14 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Column 3: Catering Services */}
+          {/* Column 3: Catering Services — links point to quote form */}
           <div>
             <h4 className="font-display text-2xl text-white mb-6">Catering</h4>
             <ul className="space-y-4">
-              <li><Link href="/catering" className="hover:text-secondary transition-colors inline-block hover:translate-x-1 duration-300">Wedding Receptions</Link></li>
-              <li><Link href="/catering" className="hover:text-secondary transition-colors inline-block hover:translate-x-1 duration-300">Family Gatherings</Link></li>
-              <li><Link href="/catering" className="hover:text-secondary transition-colors inline-block hover:translate-x-1 duration-300">Corporate Events</Link></li>
-              <li><Link href="/catering" className="hover:text-secondary transition-colors inline-block hover:translate-x-1 duration-300">Community Iftars</Link></li>
+              <li><Link href="/quote" className="hover:text-secondary transition-colors inline-block hover:translate-x-1 duration-300">Wedding Receptions</Link></li>
+              <li><Link href="/quote" className="hover:text-secondary transition-colors inline-block hover:translate-x-1 duration-300">Family Gatherings</Link></li>
+              <li><Link href="/quote" className="hover:text-secondary transition-colors inline-block hover:translate-x-1 duration-300">Corporate Events</Link></li>
+              <li><Link href="/quote" className="hover:text-secondary transition-colors inline-block hover:translate-x-1 duration-300">Community Iftars</Link></li>
               <li><Link href="/quote" className="hover:text-secondary transition-colors inline-block hover:translate-x-1 duration-300 text-secondary font-bold">Request a Quote →</Link></li>
             </ul>
           </div>

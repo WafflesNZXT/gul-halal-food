@@ -8,7 +8,6 @@ import { useCart } from "@/contexts/CartContext";
 const navLinks = [
   { name: "Home", href: "/" },
   { name: "Our Menu", href: "/menu" },
-  { name: "Catering", href: "/catering" },
   { name: "About Us", href: "/about" },
   { name: "Gallery", href: "/gallery" },
   { name: "Testimonials", href: "/testimonials" },
@@ -74,7 +73,6 @@ export function Navbar() {
     }
   };
 
-  // Scrolled: deep-green translucent glass. Top: warm translucent cream.
   const navScrolledClass =
     "bg-[#1b3a1b]/88 backdrop-blur-lg border border-green-800/40 shadow-[0_4px_24px_rgba(27,58,27,0.25)]";
   const navTopClass =
@@ -146,10 +144,9 @@ export function Navbar() {
             </ul>
 
             <div className="hidden xl:flex items-center gap-3">
-              {/* Cart button */}
               <button
                 onClick={toggleCart}
-                className={`relative p-2 rounded-full motion-safe:transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
+                className={`relative p-2 rounded-full motion-safe:transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 cursor-pointer ${
                   isScrolled
                     ? "text-white/80 hover:text-white hover:bg-white/10"
                     : "text-foreground/70 hover:text-primary hover:bg-muted"
@@ -165,7 +162,7 @@ export function Navbar() {
               </button>
               <Link href="/quote" className="inline-block">
                 <Button
-                  className={`rounded-full font-bold px-5 shadow-sm motion-safe:transition-colors ${
+                  className={`rounded-full font-bold px-5 shadow-sm motion-safe:transition-colors cursor-pointer ${
                     isScrolled
                       ? "bg-secondary text-white hover:bg-secondary/90"
                       : "bg-primary text-primary-foreground hover:bg-primary/90"
@@ -180,7 +177,7 @@ export function Navbar() {
             <div className="xl:hidden flex items-center gap-1">
               <button
                 onClick={toggleCart}
-                className={`relative p-2 rounded-full motion-safe:transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
+                className={`relative p-2 rounded-full motion-safe:transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary cursor-pointer ${
                   isScrolled
                     ? "text-white/80 hover:bg-white/10"
                     : "text-foreground hover:bg-muted"
@@ -196,7 +193,7 @@ export function Navbar() {
               </button>
               <button
                 ref={menuButtonRef}
-                className={`rounded-full p-2 motion-safe:transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
+                className={`rounded-full p-2 motion-safe:transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 cursor-pointer ${
                   isScrolled
                     ? "text-white/80 hover:bg-white/10"
                     : "text-foreground hover:bg-muted"
@@ -254,7 +251,7 @@ export function Navbar() {
             >
               <Button
                 size="lg"
-                className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90 font-bold px-8 w-full text-lg py-6 shadow-md"
+                className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90 font-bold px-8 w-full text-lg py-6 shadow-md cursor-pointer"
               >
                 Request a Quote
               </Button>

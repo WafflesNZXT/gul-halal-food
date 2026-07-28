@@ -164,7 +164,7 @@ function DishDetailContent({ slug }: { slug: string }) {
               <p className="mt-5 text-xl leading-relaxed text-foreground/80">
                 {dish.shortDescription ?? dish.description}
               </p>
-              <p className="mt-4 leading-relaxed text-foreground/75">
+              <p className="hidden sm:block mt-4 leading-relaxed text-foreground/75">
                 {dish.longDescription ?? dish.description}
               </p>
 

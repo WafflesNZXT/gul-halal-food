@@ -7,7 +7,6 @@ import { Route, Switch, Router as WouterRouter, Redirect } from "wouter";
 
 import Home from "@/pages/home";
 import Menu from "@/pages/menu";
-import Catering from "@/pages/catering";
 import About from "@/pages/about";
 import Gallery from "@/pages/gallery";
 import Testimonials from "@/pages/testimonials";
@@ -26,7 +25,7 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={Home} />
-      {/* Legacy slug redirects — keep permalinks working */}
+      {/* Legacy slug redirects */}
       <Route path="/menu/chicken-biryani">
         <Redirect to="/menu/biryani" />
       </Route>
@@ -36,9 +35,12 @@ function Router() {
       <Route path="/menu/daal-chawal">
         <Redirect to="/menu/daal" />
       </Route>
+      {/* Removed Catering page — redirect old bookmarks to the quote form */}
+      <Route path="/catering">
+        <Redirect to="/quote" />
+      </Route>
       <Route path="/menu/:slug" component={DishDetail} />
       <Route path="/menu" component={Menu} />
-      <Route path="/catering" component={Catering} />
       <Route path="/about" component={About} />
       <Route path="/gallery" component={Gallery} />
       <Route path="/testimonials" component={Testimonials} />

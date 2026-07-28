@@ -3,51 +3,74 @@ import { Layout } from "@/components/Layout";
 import { PageHeader } from "@/components/PageHeader";
 import { menu } from "@/data/menu";
 import { MenuCard } from "@/components/MenuCard";
+import { Reveal } from "@/components/Reveal";
 import { QuoteCTA } from "@/components/QuoteCTA";
 import { cn } from "@/lib/utils";
 
 export default function Menu() {
-  const categories = ["All", "Rice Dishes", "Curries", "Meat Specialties", "Vegetarian", "Appetizers", "Breads & Sides", "Desserts"];
+  const categories = [
+    "All",
+    "Rice Dishes",
+    "Curries",
+    "Meat Specialties",
+    "Vegetarian",
+    "Appetizers",
+    "Breads & Sides",
+    "Desserts",
+  ];
   const [activeCategory, setActiveCategory] = useState("All");
 
-  const filteredMenu = activeCategory === "All" 
-    ? menu 
-    : menu.filter(item => item.category === activeCategory);
+  const filteredMenu =
+    activeCategory === "All"
+      ? menu
+      : menu.filter((item) => item.category === activeCategory);
 
   return (
     <Layout>
-      <PageHeader 
-        title="Our Authentic Menu" 
+      <PageHeader
+        title="Our Authentic Menu"
         description="Explore our rich, traditional Pakistani dishes made with love, fresh ingredients, and whole spices."
       />
-      
+
       <section className="py-20 bg-background">
         <div className="container mx-auto px-4 md:px-6">
-          
-          {/* Filter Tabs */}
-          <div className="flex flex-wrap justify-center gap-3 mb-12">
+
+          {/* Category filter tabs
+              Mobile: horizontally scrollable single row with shrink-0 pills
+              Desktop: wrapping centered row */}
+          <div
+            className="flex gap-2 overflow-x-auto pb-2 sm:flex-wrap sm:justify-center sm:overflow-x-visible sm:pb-0 sm:gap-3 -mx-4 px-4 sm:mx-0 sm:px-0 mb-8 sm:mb-12"
+            role="group"
+            aria-label="Filter menu by category"
+          >
             {categories.map((cat) => (
               <button
                 key={cat}
                 onClick={() => setActiveCategory(cat)}
                 className={cn(
-                  "px-6 py-2.5 rounded-full font-semibold transition-all duration-300",
-                  activeCategory === cat 
-                    ? "bg-primary text-primary-foreground shadow-md scale-105" 
+                  "shrink-0 px-5 py-3 rounded-full font-semibold transition-all duration-300 text-sm cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
+                  activeCategory === cat
+                    ? "bg-primary text-primary-foreground shadow-md"
                     : "bg-card text-foreground/70 hover:bg-muted hover:text-primary border border-border"
                 )}
+                aria-pressed={activeCategory === cat}
               >
                 {cat}
               </button>
             ))}
           </div>
 
-          {/* Menu Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-            {filteredMenu.map((item) => (
-              <MenuCard key={item.id} item={item} />
+          {/* Menu grid
+              Mobile  (< sm, < 640px) : 2-column compact cards — gap-3
+              Tablet  (sm–lg)         : 2-column full cards   — gap-6
+              Desktop (lg+)           : 3-column full cards   — gap-8  */}
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3 lg:gap-8">
+            {filteredMenu.map((item, idx) => (
+              <Reveal key={item.id} delay={Math.min(idx * 0.05, 0.3)}>
+                <MenuCard item={item} />
+              </Reveal>
             ))}
-            
+
             {filteredMenu.length === 0 && (
               <div className="col-span-full py-20 text-center text-foreground/60 text-lg">
                 No items found in this category yet.

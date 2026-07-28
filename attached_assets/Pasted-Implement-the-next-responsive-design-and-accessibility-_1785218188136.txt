@@ -1,0 +1,448 @@
+Implement the next responsive-design and accessibility refinement pass for the Gul Halal Food website.
+
+Inspect the existing project and all attached screenshots before editing. Preserve the current visual identity, menu data, dish-detail routes, cart system, truthful pricing behavior, order-request flow, accessibility work, and working React/Vite/TypeScript architecture.
+
+This website will be used primarily by older Desi uncles and aunties. Prioritize:
+
+- Clarity
+- Large readable text
+- Obvious interactions
+- Generous touch targets
+- Simple navigation
+- Minimal visual confusion
+- Consistent behavior across pages
+
+Do not rebuild the website from scratch.
+
+Run before making changes:
+
+- npm run typecheck
+- npm run build
+
+Keep both commands passing throughout the task.
+
+==================================================
+1. CLEAN UP THE ABOUT PAGE
+==================================================
+
+The About page currently contains large wave-shaped dividers that do not fit the page and create awkward empty green areas.
+
+Remove those wave dividers from the About page entirely.
+
+This includes any decorative wave:
+
+- Below the About page header
+- Between About page sections
+- Above or below the value-card section
+- Above the footer or final section when it creates an unnecessary green gap
+
+After removing them:
+
+- Close the empty vertical gaps
+- Use clean section spacing
+- Keep transitions between cream and green sections intentional
+- Do not leave floating curved lines
+- Do not replace them with another large decorative divider
+- Preserve the existing content and overall About page structure
+
+The page should feel cleaner, calmer, and easier to follow.
+
+==================================================
+2. FIX THE “FAMILY-OWNED SINCE 1985” CARD
+==================================================
+
+The “Family-Owned Since 1985” value card currently has poor color contrast and does not visually match the surrounding cards.
+
+Redesign its color treatment while preserving its content.
+
+Preferred treatment:
+
+- Deep forest-green background
+- White or warm-cream heading
+- White or pale-cream supporting text
+- Golden-orange icon and/or border accent
+- Subtle shadow
+- Strong text contrast
+- Same corner radius and dimensions as the neighboring value cards
+
+Requirements:
+
+- All text must be immediately readable
+- Do not use dark brown text on a dark green background
+- Do not make this card look disabled
+- Preserve the existing icon and meaning
+- Keep visual consistency with the Gul Halal Food palette
+- Verify contrast on desktop and mobile
+
+==================================================
+3. ADD SUBTLE SCROLL-ENTRY TRANSITIONS ACROSS THE WEBSITE
+==================================================
+
+Add tasteful scroll transitions to all pages.
+
+Use a reusable system rather than manually duplicating animation code in every component.
+
+Apply subtle reveal animations to appropriate content, such as:
+
+- Page headings
+- Section headings
+- Text blocks
+- Menu cards
+- Value cards
+- Gallery entries
+- Testimonial cards
+- Forms
+- CTA sections
+- About-page image and text columns
+
+Recommended animation:
+
+- Small fade-in
+- Slight upward movement
+- Short duration
+- Gentle stagger for grouped cards
+
+Do not use:
+
+- Large movement
+- Spinning
+- Bouncing
+- Excessive delays
+- Long cinematic transitions
+- Animations that prevent immediate interaction
+- Animations that replay constantly while scrolling slightly
+
+Requirements:
+
+- Work properly on desktop, tablet, and mobile
+- Use Intersection Observer, Framer Motion, or the existing animation system cleanly
+- Animate each section only once unless there is a strong reason otherwise
+- Avoid layout shifts
+- Avoid degrading scroll performance
+- Preserve keyboard navigation
+- Content must remain available if JavaScript animation initialization fails
+
+Reduced-motion support is mandatory:
+
+- Respect `prefers-reduced-motion: reduce`
+- Show content immediately for reduced-motion users
+- Disable movement and unnecessary fades
+- Do not hide content permanently when motion is disabled
+
+==================================================
+4. CHANGE THE HOMEPAGE POPULAR DISHES
+==================================================
+
+In the homepage “A Taste of Home” or popular-dishes preview, replace:
+
+- Plain White Rice
+
+with:
+
+- Keer
+
+The homepage popular dishes should now feature:
+
+- Biryani
+- Haleem
+- Chicken Karahi
+- Keer
+
+Use the existing Keer menu data, realistic image, description, price label, route, and detail-page link.
+
+Do not delete Plain White Rice from the full menu.
+
+Only remove it from the homepage featured/popular selection.
+
+Keep the popular-dish selection centralized through the menu data or featured-item configuration rather than hard-coding duplicate card data.
+
+==================================================
+5. REMOVE THE DUSTBIN FROM THE FAMILY KITCHEN PHOTO
+==================================================
+
+The homepage “Family Recipes, Shared with Love” section uses the attached landscape photograph of family members packing naan.
+
+Edit that photograph to remove the visible dustbin/trash bin on the left side of the kitchen counter.
+
+Use image inpainting or another proper image-editing method.
+
+Requirements:
+
+- Remove only the dustbin and its liner
+- Reconstruct the missing area naturally
+- Continue the white countertop through the removed area
+- Reconstruct nearby background details where needed
+- Match the existing lighting, perspective, shadows, and countertop texture
+- Do not blur the area
+- Do not cover it with a solid rectangle
+- Do not crop the photograph merely to hide the dustbin
+- Do not alter the two people
+- Do not alter their faces, clothing, hands, or pose
+- Do not remove or distort the naan
+- Do not change the kitchen’s overall composition
+- Keep the original landscape dimensions and framing
+
+Preserve the original source photograph.
+
+Create a new optimized edited asset, for example:
+
+`public/images/about/family-packing-naan-clean.webp`
+
+Update the homepage About preview to use the cleaned image.
+
+Keep:
+
+- The current arched landscape frame
+- The important people fully visible
+- The naan and packing activity visible
+- Appropriate responsive object positioning
+
+Verify that the edited region looks natural at full desktop size, not only as a small thumbnail.
+
+==================================================
+6. REMOVE THE CATERING PAGE
+==================================================
+
+Remove the dedicated Catering page from the active website.
+
+Remove:
+
+- The `/catering` page from normal navigation
+- The Catering item from the desktop navbar
+- The Catering item from the mobile menu
+- The Catering quick link from the footer
+- Any route-specific metadata intended only for `/catering`
+- Any direct homepage links that now lead to the removed page
+
+Do not leave broken links.
+
+For any remaining catering-service preview on the homepage:
+
+- It may remain as useful business information
+- Change its CTA to point to `/quote`
+- Use wording such as:
+  - “Plan Your Event”
+  - “Request a Quote”
+  - “Start Your Order”
+
+Handle old `/catering` visits gracefully.
+
+Preferred behavior:
+
+- Redirect `/catering` to `/quote`
+
+This avoids a broken page for old bookmarks or shared links.
+
+Do not remove general references explaining that Gul Halal Food is a catering business.
+
+==================================================
+7. REDESIGN THE FULL MENU PAGE FOR MOBILE
+==================================================
+
+The current full menu is acceptable on desktop, but on mobile it becomes a very long single-column list with unnecessary descriptions.
+
+Create a dedicated compact mobile card layout.
+
+Desktop and tablet:
+
+- Preserve the current fuller card presentation
+- Keep image, title, description, price label, spice information, and action
+- Do not unnecessarily redesign the working desktop menu
+
+Mobile layout:
+
+- Use a two-column grid
+- Show two menu items per row
+- Keep cards compact and easy to scan
+- Reduce the overall page length
+
+On mobile, each card should display only:
+
+- Realistic dish image
+- Dish title
+- Price label, currently:
+  `Contact for pricing`
+
+Hide on mobile:
+
+- Full dish description
+- Flavor-highlight text
+- Spice icons
+- Separate “View dish” text link
+- Extra dividers that consume space
+
+The full information remains available on the dish-detail page.
+
+==================================================
+8. MAKE THE ENTIRE MOBILE DISH CARD CLICKABLE
+==================================================
+
+On mobile, users should not have to find a small “View dish” link.
+
+Make the entire menu card a clear link to the dish-detail page.
+
+Requirements:
+
+- Tapping anywhere on the card opens the correct detail page
+- The whole card must be keyboard accessible
+- Use semantic anchor/link behavior
+- Include a visible focus state
+- Do not build it as a clickable `div`
+- Avoid nested links or buttons inside the linked card
+- Use an appropriate accessible label if the visible card content is not sufficient
+- Preserve route scroll-to-top behavior
+- Use pointer cursor on desktop-capable devices
+
+Desktop may retain its existing fuller card layout and explicit action if desired, but avoid conflicting nested navigation elements.
+
+==================================================
+9. MOBILE MENU CARD USABILITY FOR OLDER CUSTOMERS
+==================================================
+
+Design the compact mobile menu specifically for older customers.
+
+At widths around 360–430px:
+
+- Exactly two cards should fit per row
+- Use a comfortable gap between cards
+- Dish titles should remain readable
+- Avoid overly tiny type
+- Do not truncate important names aggressively
+- Allow two-line titles when necessary
+- Keep the price label readable
+- Use strong text contrast
+- Make cards visually separate from the background
+- Use minimum practical touch height
+- Use approximately 44px or greater interactive tap areas
+- Keep realistic food images large enough to recognize
+- Do not place text over the food image
+- Do not require precise taps
+
+Category controls on mobile should also remain simple:
+
+- Clearly labeled
+- Large enough to tap
+- Horizontally scrollable only when necessary
+- No tiny dropdown arrows or cramped controls
+- Preserve the active category state clearly
+
+==================================================
+10. MOBILE MENU RESPONSIVE BREAKPOINTS
+==================================================
+
+Test the menu at:
+
+- 430px
+- 390px
+- 375px
+- 360px
+- 320px if practical
+
+Requirements:
+
+- No horizontal page overflow
+- No card is cut off
+- No text overlaps
+- Images remain contained
+- Two columns remain usable at normal mobile widths
+- At extremely narrow widths where two columns become unreadable, allow a graceful one-column fallback rather than compressing text excessively
+
+Suggested structure:
+
+- Two columns from approximately 340px and above
+- One column only below the point where accessibility would be harmed
+
+Do not force two columns at the expense of readability.
+
+==================================================
+11. GENERAL ACCESSIBILITY AND SIMPLICITY AUDIT
+==================================================
+
+As part of this pass, review the modified pages for basic usability.
+
+Ensure:
+
+- All enabled links and buttons use the pointer cursor
+- Keyboard focus is clearly visible
+- Text contrast is sufficient
+- Buttons use clear labels
+- No critical interaction depends only on hover
+- Tap targets are comfortably sized
+- Dish cards clearly look interactive
+- Main navigation remains simple
+- Removed Catering links do not leave uneven spacing
+- Screen-reader labels remain meaningful
+- Scroll animations do not interfere with assistive technology
+- Reduced-motion preferences remain honored
+
+Avoid adding tooltips or hidden interactions that could make the interface more confusing.
+
+==================================================
+12. SCOPE LIMITS
+==================================================
+
+Do not:
+
+- Build the backend yet
+- Add payment processing
+- Add fake pricing
+- Add fake contact information
+- Change the order-management architecture
+- Remove the cart
+- Change existing dish-detail customization
+- Replace menu images unnecessarily
+- Redesign the homepage hero
+- Change unrelated menu data
+- Add a new large dependency without a clear need
+- Commit or push automatically
+
+==================================================
+13. VALIDATION
+==================================================
+
+Run:
+
+- npm run typecheck
+- npm run build
+
+Verify all of the following:
+
+- About-page wave dividers are removed
+- No large empty wave-shaped green gaps remain
+- “Family-Owned Since 1985” has strong readable contrast
+- Scroll-entry transitions work on all pages
+- Reduced-motion users see content immediately
+- Homepage popular dishes include Keer instead of Plain White Rice
+- Plain White Rice remains in the full menu
+- The dustbin is removed naturally from the family photo
+- The two people and naan remain unchanged
+- Catering is removed from desktop navigation
+- Catering is removed from mobile navigation
+- Catering is removed from footer quick links
+- `/catering` redirects safely to `/quote`
+- Homepage catering preview links no longer point to `/catering`
+- Mobile menu uses a two-column compact layout
+- Mobile menu cards show only image, title, and price label
+- The entire mobile menu card opens its detail page
+- No nested interactive elements exist inside clickable mobile cards
+- Mobile cards remain readable for older users
+- There is no horizontal overflow
+- All remaining routes still render
+- Existing cart and quote functionality still work
+
+At completion, report:
+
+1. About-page cleanup
+2. “Family-Owned Since 1985” color changes
+3. Scroll-animation system implemented
+4. Homepage featured-item change
+5. Family-photo editing method and new asset path
+6. Catering route and navigation removals
+7. Mobile menu before-and-after structure
+8. Accessibility improvements
+9. Responsive widths tested
+10. Typecheck result
+11. Build result
+12. Remaining issues
+
+Leave all changes uncommitted for review.

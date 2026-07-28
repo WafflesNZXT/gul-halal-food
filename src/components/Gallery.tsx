@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { gallery, GalleryCategory } from "@/data/gallery";
 import { SectionHeading } from "./SectionHeading";
+import { Reveal } from "./Reveal";
 import { X, ChevronLeft, ChevronRight, Maximize2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Link } from "wouter";
@@ -32,11 +33,13 @@ export function Gallery({ preview = false }: { preview?: boolean }) {
   return (
     <section className="py-20 bg-background">
       <div className="container mx-auto px-4 md:px-6">
-        <SectionHeading
-          title="From Our Kitchen to Your Celebration"
-          subtitle="Take a look at the delicious moments we've helped create."
-          className="mb-10"
-        />
+        <Reveal>
+          <SectionHeading
+            title="From Our Kitchen to Your Celebration"
+            subtitle="Take a look at the delicious moments we've helped create."
+            className="mb-10"
+          />
+        </Reveal>
 
         {!preview && <div className="flex flex-wrap justify-center gap-2 mb-12">
           {categories.map((cat) => (
@@ -44,7 +47,7 @@ export function Gallery({ preview = false }: { preview?: boolean }) {
               key={cat}
               onClick={() => setActiveCategory(cat)}
               className={cn(
-                "px-6 py-2 rounded-full font-semibold transition-all duration-300",
+                "px-6 py-2 rounded-full font-semibold transition-all duration-300 cursor-pointer",
                 activeCategory === cat
                   ? "bg-primary text-primary-foreground shadow-md"
                   : "bg-card text-foreground/70 hover:bg-muted border border-border"
@@ -99,14 +102,14 @@ export function Gallery({ preview = false }: { preview?: boolean }) {
           onClick={closeLightbox}
           onKeyDown={(e) => {
             if (e.key === "Escape") closeLightbox();
-            if (e.key === "ArrowRight") nextImage(e as any);
-            if (e.key === "ArrowLeft") prevImage(e as any);
+            if (e.key === "ArrowRight") nextImage(e as unknown as React.MouseEvent);
+            if (e.key === "ArrowLeft") prevImage(e as unknown as React.MouseEvent);
           }}
           tabIndex={0}
           autoFocus
         >
           <button
-            className="absolute top-6 right-6 text-white/70 hover:text-white bg-black/50 rounded-full p-2"
+            className="absolute top-6 right-6 text-white/70 hover:text-white bg-black/50 rounded-full p-2 cursor-pointer"
             onClick={closeLightbox}
             aria-label="Close lightbox"
           >
@@ -114,7 +117,7 @@ export function Gallery({ preview = false }: { preview?: boolean }) {
           </button>
 
           <button
-            className="absolute left-4 top-1/2 -translate-y-1/2 text-white/70 hover:text-white bg-black/50 p-3 rounded-full hidden md:block"
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-white/70 hover:text-white bg-black/50 p-3 rounded-full hidden md:block cursor-pointer"
             onClick={prevImage}
             aria-label="Previous image"
           >
@@ -142,7 +145,7 @@ export function Gallery({ preview = false }: { preview?: boolean }) {
           </div>
 
           <button
-            className="absolute right-4 top-1/2 -translate-y-1/2 text-white/70 hover:text-white bg-black/50 p-3 rounded-full hidden md:block"
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-white/70 hover:text-white bg-black/50 p-3 rounded-full hidden md:block cursor-pointer"
             onClick={nextImage}
             aria-label="Next image"
           >
