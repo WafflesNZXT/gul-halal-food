@@ -1,0 +1,716 @@
+Implement the next focused revision of the Gul Halal Food website.
+
+Inspect all attached screenshots and the current project before editing. Preserve the existing multi-page structure, visual identity, truthful business configuration, accessibility work, and working Vite/React architecture.
+
+Do not rebuild the website from scratch.
+
+The attached images include:
+
+- The current navbar
+- Current featured menu cards
+- Current dish-detail layout
+- Current spice-level presentation
+- Current flavor-highlights presentation
+- A Pakistani village/community cooking photograph to use as the homepage hero background
+
+Run these first:
+
+- npm run typecheck
+- npm run build
+
+Preserve a passing state throughout the task.
+
+--------------------------------------------------
+1. FIX THE NAVBAR WORDMARK SPACING
+--------------------------------------------------
+
+The current navbar illustration and general lockup look good, but the stacked text beside the grandmother is vertically uneven.
+
+Current problem:
+
+- “Gul” sits too high.
+- The space between “Gul,” “Halal Food,” and “Pakistani Catering” is inconsistent.
+- The three lines do not feel like one balanced logo lockup.
+
+Adjust only the text alignment and spacing.
+
+Requirements:
+
+- Move “Gul” slightly downward.
+- Make the vertical spacing between all three lines visually even.
+- Keep “Gul” as the largest line.
+- Keep “Halal” green.
+- Keep “Food” orange.
+- Keep “PAKISTANI CATERING” smaller and letter-spaced.
+- Vertically center the entire wordmark relative to the grandmother illustration.
+- Keep the serving plate fully visible.
+- Do not recreate, crop, or regenerate the grandmother.
+- Do not revert to a circular or square logo treatment.
+- Do not significantly increase the navbar height.
+
+Create reusable spacing styles instead of random transforms scattered across the component.
+
+--------------------------------------------------
+2. TRANSPARENT NAVBAR AT THE TOP, GREEN GLASS NAVBAR ON SCROLL
+--------------------------------------------------
+
+Change the navbar behavior.
+
+At the top of the page:
+
+- The outer header area should have no solid green background.
+- The navbar should feel lightweight and integrated into the hero.
+- Keep the rounded navbar shape if it still looks polished.
+- Use a mostly transparent or warm translucent surface.
+- Avoid a heavy opaque white card.
+- Maintain readable navigation text and logo.
+
+After scrolling approximately 20–40px:
+
+- Keep the navbar sticky.
+- Transition smoothly into a dark-green translucent glass treatment.
+- Use backdrop blur.
+- Use a subtle green border.
+- Use a restrained shadow.
+- Keep the transition smooth rather than abrupt.
+- Ensure all navigation text remains readable.
+- Adjust the wordmark colors only if necessary for contrast.
+- Preserve the orange “Food” accent.
+- Keep the quote button visually distinct.
+
+Suggested effect:
+
+- deep forest-green background around 80–90% opacity
+- backdrop blur
+- soft green shadow
+- cream or pale navigation text
+- orange active accents where appropriate
+
+Respect reduced-motion preferences.
+
+Test the navbar on:
+
+- the homepage hero
+- cream internal pages
+- mobile
+- desktop
+
+--------------------------------------------------
+3. UPDATE CHICKEN BIRYANI TO BIRYANI
+--------------------------------------------------
+
+Change the menu item title everywhere from:
+
+“Chicken Biryani”
+
+to:
+
+“Biryani”
+
+Update all relevant locations:
+
+- Homepage popular-menu card
+- Full menu page
+- Dish-detail page
+- Cart/order data
+- Slug and route if appropriate
+- Metadata
+- Suggested-order context
+
+Preferred route:
+
+`/menu/biryani`
+
+Redirect or preserve compatibility with the old `/menu/chicken-biryani` route if it already exists.
+
+Use this short description:
+
+“Aromatic basmati rice cooked with tender chicken, beef, or mutton, exotic spices, and saffron.”
+
+Update the long description so that it truthfully explains that Gul Halal Food offers biryani with a choice of:
+
+- Chicken
+- Beef
+- Mutton
+
+Do not imply that all three meats are mixed into one serving.
+
+Add a required meat-choice selector when adding Biryani to the cart:
+
+- Chicken
+- Beef
+- Mutton
+
+Default to no selection rather than silently choosing one.
+
+Update Biryani flavor highlights to something appropriate, such as:
+
+- Basmati rice
+- Whole spices
+- Saffron
+- Fried onions
+- Choice of chicken, beef, or mutton
+
+Keep editable content centralized in the menu data file.
+
+--------------------------------------------------
+4. GENERATE A REALISTIC BIRYANI IMAGE
+--------------------------------------------------
+
+Generate a new realistic Biryani image using Replit’s available image-generation capability.
+
+Image requirements:
+
+- Photorealistic Pakistani biryani
+- Chicken may be used in the image as the representative visual
+- Large traditional dark-brown or carved brown serving plate
+- Plate should visually match the dark-brown serving dishes in the homepage hero artwork
+- Warm appetizing lighting
+- Slight top-down three-quarter angle
+- Visible basmati rice, fried onions, herbs, and chicken pieces
+- Isolated composition
+- Transparent background
+- No table
+- No kitchen
+- No hands
+- No people
+- No text
+- No label
+- No circular crop
+- No emoji appearance
+- No white or cream rectangular background
+- Soft natural grounding shadow only
+
+Create optimized versions appropriate for:
+
+- menu card thumbnail
+- dish-detail hero image
+
+Prefer one high-quality master asset reused responsively rather than two visually inconsistent generations.
+
+Suggested path:
+
+`public/images/menu/biryani.webp`
+
+Update the homepage card, menu card, and Biryani detail page to use this image.
+
+Use `object-fit: contain`.
+
+Do not crop off the plate.
+
+--------------------------------------------------
+5. REPLACE SPICE DOTS WITH FIRE ICONS
+--------------------------------------------------
+
+The menu cards currently show small colored dots for spice level, which are unclear.
+
+Replace the dots everywhere with small fire icons.
+
+Use a consistent three-level scale:
+
+- 1 of 3
+- 2 of 3
+- 3 of 3
+
+For example, level 2 should show:
+
+- two filled orange fire icons
+- one muted pale fire icon
+
+Requirements:
+
+- Use the same visual system on:
+  - homepage featured cards
+  - full menu cards
+  - dish-detail pages
+  - cart item configuration where relevant
+- Include accessible text such as:
+  - `Spice level 2 of 3`
+- Do not rely only on color.
+- Keep the icons aligned from left to right.
+- Do not change icon size to represent intensity.
+- The number of filled icons represents the level.
+- Use a reusable `SpiceLevel` component.
+
+--------------------------------------------------
+6. LET USERS CHOOSE THEIR SPICE LEVEL
+--------------------------------------------------
+
+Users should be able to choose spice level for applicable dishes.
+
+Create a reusable selector with:
+
+- Mild — 1 fire
+- Medium — 2 fires
+- Hot — 3 fires
+
+Requirements:
+
+- Use radio-button semantics or another accessible single-choice control.
+- Make the entire option easy to click.
+- Show filled fire icons consistently.
+- Require a selection before adding a configurable dish to the cart, unless a documented default exists.
+- Store the selected spice level with the cart item.
+- Allow the user to change it from the cart drawer.
+- Preserve the dish’s suggested/default spice level as informational, but do not prevent customers from selecting another level where customization is allowed.
+
+On dish-detail pages:
+
+- Place the spice selector left-aligned.
+- Do not enlarge icons for the detail page.
+- Use exactly the same fire size and visual language as the cards.
+- Clearly separate:
+  - recommended/default spice level
+  - customer-selected spice level
+
+For dishes that cannot reasonably be customized later, support a data flag such as:
+
+`spiceCustomizable: false`
+
+--------------------------------------------------
+7. ADD A RIGHT-SIDE CART DRAWER
+--------------------------------------------------
+
+Add a global cart/order-request system.
+
+The cart should open as a clean drawer from the right side.
+
+Add a cart button in the navbar showing:
+
+- Cart icon
+- Current item count
+- Accessible label
+
+The drawer should include:
+
+For each item:
+
+- Dish image
+- Dish name
+- Meat/protein choice when applicable
+- Spice level
+- Quantity
+- Unit price when available
+- Line subtotal when available
+- Edit options
+- Remove action
+
+Controls:
+
+- Increase quantity
+- Decrease quantity
+- Remove item
+- Change spice level
+- Change meat choice where applicable
+
+At the bottom:
+
+- Pricing breakdown
+- Items subtotal
+- Any future fees shown only when configured
+- Estimated total
+- Main CTA:
+  `Request This Order`
+
+Clicking `Request This Order` should:
+
+- Navigate to the quote/order page
+- Transfer all selected cart items into the order-request form
+- Add a clear structured order summary
+- Preserve:
+  - dish
+  - variation
+  - spice level
+  - quantity
+  - pricing information when available
+
+PRICING SAFETY:
+
+Real prices have not yet been confirmed.
+
+Do not invent prices.
+
+Build the complete pricing system using optional fields such as:
+
+- basePrice
+- variationPrice
+- unitPrice
+
+When a price is unavailable:
+
+- Show `Pricing pending`
+- Do not display `$0.00`
+- Do not calculate a misleading total
+- Show:
+  `Final pricing will be confirmed with your catering quote.`
+
+If every cart item has a confirmed price later, the subtotal and total should calculate automatically.
+
+Keep all price data centralized in the menu data model.
+
+Persist the cart in local storage so a page refresh does not erase it.
+
+Validate and safely parse stored cart data.
+
+--------------------------------------------------
+8. UPDATE DISH-DETAIL SPICE PRESENTATION
+--------------------------------------------------
+
+On every dish-detail page:
+
+- Keep spice information left-aligned.
+- Replace the current separated text-plus-icons treatment with the shared `SpiceLevel` component.
+- Keep all fire icons the same size.
+- Fill the number of fires matching the recommended level.
+- Place the selectable spice control directly below or near it when customization is supported.
+- Do not use larger icons on detail pages.
+- Do not use plain colored dots anywhere.
+
+--------------------------------------------------
+9. UPDATE HALEEM
+--------------------------------------------------
+
+Change the item title everywhere from:
+
+“Beef Haleem”
+
+to:
+
+“Haleem”
+
+Update:
+
+- Homepage card
+- Full menu card
+- Detail page
+- Cart/order data
+- Route and metadata where appropriate
+
+Preferred route:
+
+`/menu/haleem`
+
+Preserve compatibility with the old `/menu/beef-haleem` route if it exists.
+
+Use an updated short description explaining the available protein choices:
+
+“Slow-cooked haleem made with wheat, lentils, aromatic spices, and your choice of chicken or beef, garnished with fried onions and ginger.”
+
+Add a required protein selector:
+
+- Chicken
+- Beef
+
+Do not imply both meats are combined.
+
+Update the long description and flavor highlights accordingly.
+
+Suggested flavor highlights:
+
+- Wheat
+- Lentils
+- Slow-cooked meat
+- Fried onions
+- Ginger
+- Choice of chicken or beef
+
+--------------------------------------------------
+10. GENERATE A REALISTIC HALEEM IMAGE
+--------------------------------------------------
+
+Generate a realistic Haleem image matching the Biryani image system.
+
+Requirements:
+
+- Photorealistic Pakistani haleem
+- Traditional dark-brown, copper, or carved-brown serving bowl
+- Same camera angle, lighting, scale, and visual family as the Biryani image
+- Thick authentic haleem texture
+- Garnished with fried onions, ginger, cilantro, and a small lemon accent
+- Isolated
+- Transparent background
+- Soft grounding shadow
+- No table or background
+- No utensils unless subtle and compositionally necessary
+- No text
+- No emoji
+- No circular crop
+- No white rectangular background
+
+Suggested path:
+
+`public/images/menu/haleem.webp`
+
+Use it on:
+
+- Homepage card
+- Full menu card
+- Haleem detail page
+
+--------------------------------------------------
+11. ADD MATCHING REALISTIC IMAGES FOR EVERY OTHER MENU ITEM
+--------------------------------------------------
+
+Do not rename any other menu items.
+
+Generate or prepare a consistent realistic image for every remaining menu item.
+
+Every image should follow the same art direction:
+
+- Photorealistic Pakistani food
+- Traditional dark-brown, copper, or carved serving plate/bowl
+- Similar top-down three-quarter perspective
+- Consistent warm lighting
+- Transparent background
+- Soft grounding shadow
+- No table or room background
+- No people
+- No hands
+- No labels or text
+- No emojis
+- No circular crops
+- Plate fully visible
+- Consistent apparent scale
+
+Use centralized image paths in menu data.
+
+Do not create unrelated visual styles from item to item.
+
+Replace all current emoji-style menu thumbnails.
+
+Prioritize these three first:
+
+- Biryani
+- Haleem
+- Chicken Karahi
+
+For Chicken Karahi:
+
+- Keep the existing title
+- Use a realistic Pakistani chicken karahi image
+- Serve it in a traditional dark-brown or copper karahi-style dish
+- Keep the same transparent-background system
+
+--------------------------------------------------
+12. USE THE ATTACHED VILLAGE IMAGE AS THE HOMEPAGE HERO BACKGROUND
+--------------------------------------------------
+
+Use the attached Pakistani village/community-cooking image as the homepage hero background.
+
+This should replace the current plain whitish-cream hero background only.
+
+Do not place it on internal pages.
+
+Preserve the current hero structure:
+
+- Left heading and text
+- CTA buttons
+- Trust information
+- Right-side feast artwork
+- Decorative arch where it still works
+- Green wave divider
+
+The photograph is visually busy, so create a carefully layered composition.
+
+Requirements:
+
+- Use the image as a full hero background with `background-size: cover`.
+- Choose an intentional `background-position`.
+- Avoid stretching.
+- Keep major people and the central cooking scene recognizable.
+- Add overlays to preserve readability.
+
+Suggested overlay system:
+
+- A cream-to-transparent gradient behind the left text
+- A subtle dark-green or warm-brown translucent overlay across the full image
+- A slightly stronger fade behind the right-side food artwork if necessary
+- Optional soft vignette around the edges
+
+Text and CTAs:
+
+- Heading must remain highly readable.
+- Use cream, deep green, or a controlled combination based on contrast.
+- Add subtle text shadow only if needed.
+- Buttons must retain strong contrast.
+- Trust-feature text must remain readable.
+- Do not place text directly over high-detail faces or cookware without an overlay.
+
+Right-side feast artwork:
+
+- Preserve the existing feast artwork.
+- Make sure it does not visually disappear into the photographic background.
+- Add a restrained cream glow, outline, or translucent backing shape if necessary.
+- Do not give it a rectangular card.
+- Preserve the brown serving-dish aesthetic.
+- Keep the food dominant.
+
+Decorative arch:
+
+- Keep, simplify, or reduce it depending on how it combines with the photograph.
+- Do not stack so many visual layers that the hero becomes cluttered.
+- The photograph should feel intentional, not like a random wallpaper.
+
+Green wave:
+
+- Preserve the wave divider.
+- Ensure the hero photograph blends naturally into it.
+- Keep the slogan readable.
+
+Mobile:
+
+- Use a mobile-specific background position.
+- Keep the heading readable.
+- Avoid cropping the background into an unrecognizable image.
+- Consider stronger overlays on mobile.
+- Do not create horizontal overflow.
+
+Use an optimized WebP copy of the village image under a clear path such as:
+
+`public/images/hero/pakistani-village-cooking.webp`
+
+Preserve the original source image separately only if needed.
+
+Add meaningful alt/context only where applicable; CSS background images themselves do not require alt text.
+
+--------------------------------------------------
+13. CART AND DISH DATA ARCHITECTURE
+--------------------------------------------------
+
+Extend the menu data model cleanly.
+
+Possible fields:
+
+- id
+- slug
+- name
+- shortDescription
+- longDescription
+- image
+- category
+- flavorHighlights
+- suggestedSpiceLevel
+- spiceCustomizable
+- proteinOptions
+- basePrice
+- pricingLabel
+- featured
+- available
+
+Create typed cart models:
+
+- CartItem
+- CartItemSelection
+- ProteinOption
+- SpiceLevel
+- Money or price representation
+
+Cart line identity must include configuration.
+
+For example, these should be separate cart lines:
+
+- Biryani, chicken, mild
+- Biryani, mutton, hot
+
+Avoid duplicate lines for identical configurations; increase quantity instead.
+
+--------------------------------------------------
+14. ORDER-REQUEST INTEGRATION
+--------------------------------------------------
+
+The cart CTA should populate the existing order/quote flow.
+
+Do not falsely claim payment or confirmed ordering.
+
+Because a backend is not yet connected:
+
+- “Request This Order” is preferred over “Checkout.”
+- Clearly explain that submitting requests a final catering quote.
+- Do not charge a customer.
+- Do not claim payment was accepted.
+- Do not create fake order numbers.
+- Do not send fake receipts.
+
+The order form should show an editable cart summary.
+
+Changes in the cart should remain synchronized until the request is submitted.
+
+--------------------------------------------------
+15. SCOPE LIMITS
+--------------------------------------------------
+
+Do not:
+
+- Add fake prices
+- Add payment processing
+- Add a fake backend
+- Add fake email sending
+- Invent portion sizes
+- Invent tray sizes
+- Invent delivery fees
+- Rename menu items other than:
+  - Chicken Biryani → Biryani
+  - Beef Haleem → Haleem
+- Replace the logo
+- Change internal-page titles
+- Remove accessibility work
+- Remove route-scroll behavior
+- Rebuild the website from scratch
+- Commit or push automatically
+
+--------------------------------------------------
+16. VALIDATION
+--------------------------------------------------
+
+Run:
+
+- npm run typecheck
+- npm run build
+
+Verify:
+
+- “Gul” is vertically balanced in the navbar lockup.
+- Navbar is lightweight at the top.
+- Navbar becomes blurred translucent green after scrolling.
+- Navbar remains sticky.
+- Biryani is renamed everywhere.
+- Biryani description lists chicken, beef, or mutton.
+- Biryani protein choice is required before adding it.
+- Haleem is renamed everywhere.
+- Haleem supports chicken or beef.
+- Biryani and Haleem flavor highlights are updated.
+- Emoji menu images are replaced.
+- Generated images use realistic brown serving dishes.
+- Every menu card uses fire icons rather than dots.
+- Spice selections work and are stored in the cart.
+- Detail-page fire icons are left-aligned and consistently sized.
+- Cart drawer opens from the right.
+- Quantity, variation, spice, and removal controls work.
+- Cart persists through refresh.
+- Missing prices do not produce fake totals.
+- Cart transfers into the order-request form.
+- The village photograph is used as the homepage hero background.
+- Hero text and buttons remain readable.
+- All routes still render.
+- No horizontal overflow was introduced.
+- Reduced-motion behavior remains supported.
+
+At completion report:
+
+1. Navbar spacing changes
+2. Navbar scroll-state implementation
+3. Menu data changes
+4. Biryani changes
+5. Haleem changes
+6. Images generated and their paths
+7. Spice component and selection behavior
+8. Cart architecture
+9. Pricing behavior with missing prices
+10. Order-request integration
+11. Hero background treatment
+12. Responsive checks
+13. Typecheck result
+14. Build result
+15. Remaining work
+
+Leave all changes uncommitted for review.

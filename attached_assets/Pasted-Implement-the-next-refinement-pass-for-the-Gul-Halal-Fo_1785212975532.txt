@@ -1,0 +1,292 @@
+Implement the next refinement pass for the Gul Halal Food website.
+
+Inspect the current project and the attached screenshots before editing. Preserve the existing multi-page structure, cart architecture, truthful business configuration, accessibility improvements, menu routing, and working Vite/React/TypeScript setup.
+
+Run first:
+- npm run typecheck
+- npm run build
+
+Preserve a passing state throughout the task.
+
+Do not rebuild the site from scratch.
+
+==================================================
+1. FIX HERO DESCRIPTION READABILITY
+==================================================
+
+The small hero description text is currently hard to read against the new village-photo background.
+
+Adjust only the hero supporting paragraph and nearby supporting copy so it is clearly readable.
+
+Requirements:
+- Use a plain solid text color with strong contrast.
+- Do NOT use outlined text, stroked text, glow-border text, or decorative text borders.
+- Keep the style clean and modern.
+- Ensure readability on desktop and mobile.
+- If needed, strengthen the overlay or local background fade behind the text area, but do not make the hero look muddy.
+- Preserve the main hero heading, CTA buttons, trust features, right-side feast artwork, and wave divider.
+
+Preferred result:
+- hero heading remains strong
+- supporting paragraph becomes easy to read immediately
+- no awkward visual effects
+
+==================================================
+2. ADJUST SCROLLED NAVBAR LOGO COLORS
+==================================================
+
+The default top-position navbar is good.
+
+When the navbar scrolls and becomes the green translucent sticky version, some brand text becomes too hard to see.
+
+Fix the scrolled state so that:
+- “Gul” becomes white
+- “Halal” becomes white
+- “Pakistani Catering” becomes white
+- “Food” remains orange
+- contrast stays strong against the green blurred background
+
+Requirements:
+- only change the scrolled-state logo colors, not the default top-state colors
+- keep the sticky and blurred glass effect
+- keep the quote button readable
+- preserve smooth transitions
+- preserve reduced-motion support
+
+==================================================
+3. REMOVE THE LITTLE CIRCLE/OVAL BACKGROUND BEHIND MENU ITEM IMAGE THUMBNAILS
+==================================================
+
+The menu-item profile/thumbnail images currently sit inside a circular/oval background.
+
+Remove that background treatment.
+
+Requirements:
+- show only the realistic dish image itself
+- let the dish image be slightly larger than it is now
+- preserve transparent-background isolated food style
+- do not reintroduce a circular frame
+- do not add a square card around the image
+- keep plate fully visible
+- keep consistent alignment across cards
+- use the same no-background treatment on:
+  - homepage featured items
+  - full menu cards
+  - dish-detail related item previews if any
+  - cart item thumbnail if appropriate
+
+The card should still look balanced after removing the oval.
+
+==================================================
+4. CHANGE CATERING QUANTITY LOGIC TO “NUMBER OF PEOPLE”
+==================================================
+
+This is catering, so quantity should reflect how many people the order is for, rather than “1 or 2 orders”.
+
+Update the dish-detail page configuration and the cart logic accordingly.
+
+Requirements:
+- In dish-detail pages, the 3rd main preference/input should be:
+  “How many people is this for?”
+- Use a numeric stepper/input with accessible controls.
+- Minimum should be sensible, such as 1 or a configurable minimum.
+- Label clearly that the order is for people/servings.
+- This value should be stored with the cart item.
+- In the cart side drawer, replace the old quantity behavior with the same concept:
+  - number of people
+  - increase/decrease controls adjust people count
+- Line items should show the selected people count clearly.
+- Preserve other configuration like:
+  - protein choice where applicable
+  - spice level where applicable
+- Keep the cart architecture typed and consistent.
+
+Pricing:
+- We still do not have confirmed prices.
+- Do not invent totals.
+- If pricing remains unavailable, continue to show:
+  “Pricing pending”
+  and
+  “Final pricing will be confirmed with your catering quote.”
+
+==================================================
+5. ADD DETAIL PAGES AND DATA FOR ALL REMAINING MENU ITEMS + NEW ITEMS
+==================================================
+
+Create detail pages for the rest of the menu items, matching the same system used for Biryani, Haleem, and Chicken Karahi.
+
+Also add these new items with proper data, routes, and realistic images:
+
+- Chicken 65
+- Daal Chawal
+- Wraps
+- Naan
+- Keer
+
+Requirements for all these new items:
+- add them to centralized menu data
+- include slug
+- include short description
+- include long description
+- include flavor highlights
+- include image path
+- include spice-level info if applicable
+- include customization options if applicable
+- include detail pages
+- include menu-card display
+- include cart integration
+- include order-request integration
+
+Specific content guidance:
+
+A) Chicken 65
+- spicy fried chicken appetizer/side style
+- realistic image in a brown/copper serving dish
+- transparent background
+- proper detail page
+
+B) Daal Chawal
+- include a small helpful note in the description that “chawal” means rice
+- realistic image with daal and rice in matching brown serving dish style
+- transparent background
+- proper detail page
+
+C) Wraps
+- describe them as wraps with chicken, salad, and sauce
+- realistic image in matching style
+- transparent background
+- proper detail page
+
+D) Naan
+- keep it as Naan
+- add a customization option for:
+  - Regular
+  - Garlic
+- mention in the description that naan can also be garlic naan
+- realistic image with brown serving style
+- transparent background
+- proper detail page
+
+E) Keer
+- dessert item
+- realistic image in matching serving bowl style
+- transparent background
+- proper detail page
+
+Image direction for ALL menu items:
+- photorealistic Pakistani food
+- same warm lighting family
+- same brown/copper/carved serving plate or bowl aesthetic
+- isolated transparent background
+- no table
+- no background room
+- no hands
+- no text
+- no emoji-style icons
+- no circular crop
+- no circular badge behind image
+- fully visible dish
+- consistent apparent scale and angle across menu items
+
+Do not rename existing items except ones already intentionally renamed earlier.
+
+==================================================
+6. QUOTE / REQUEST ORDER FORM CHANGES
+==================================================
+
+In the request quote / request order interface:
+
+Remove these fields entirely:
+- Estimated Guest Count
+- Preferred Dishes & Ideas
+- Dietary Requirements
+
+Make the following required:
+- Full Name
+- Email Address
+- Phone Number
+- Event Date
+- Event Type
+- Venue / City
+
+Venue / City must be required now.
+
+Add stronger warning/validation behavior when the user clicks “Place Order” without required fields completed.
+
+Requirements:
+- preserve accessible validation
+- show clear visible warnings/messages
+- highlight missing required fields
+- do not log personal data to the console
+- do not claim the order was placed if validation fails
+- preserve the honest disconnected-backend behavior
+- if backend is still not connected, keep the truthful message that online ordering is not connected / not yet sent
+- keep the CTA label as “Place Order”
+
+Also ensure the cart/order summary still integrates correctly into the order-request form.
+
+==================================================
+7. KEEP EXISTING GOOD BEHAVIOR
+==================================================
+
+Do not break or remove:
+- route scroll-to-top behavior
+- sticky navbar
+- glass scroll-state navbar
+- cart drawer
+- spice selection
+- realistic hero feast artwork
+- village-image hero background
+- truthful pricing behavior
+- accessibility improvements already added
+- reduced-motion behavior
+- page routes and dish-detail routing
+- type-safe menu/cart architecture
+
+==================================================
+8. VALIDATION
+==================================================
+
+Run:
+- npm run typecheck
+- npm run build
+
+Then verify:
+- hero supporting paragraph is clearly readable
+- scrolled navbar shows white “Gul”, white “Halal”, white “Pakistani Catering”, orange “Food”
+- menu thumbnails have no oval/circle background
+- menu dish thumbnails are slightly larger
+- dish-detail page uses “How many people is this for?”
+- cart uses people count instead of simple quantity
+- all remaining menu items now have detail pages
+- the new items are present:
+  - Chicken 65
+  - Daal Chawal
+  - Wraps
+  - Naan
+  - Keer
+- Naan supports garlic option
+- Daal Chawal description explains chawal means rice
+- quote form removed:
+  - Estimated Guest Count
+  - Preferred Dishes & Ideas
+  - Dietary Requirements
+- Venue / City is required
+- Place Order shows validation warnings if required fields are missing
+- no horizontal overflow is introduced
+- all routes still render
+
+At completion, report:
+1. Hero readability changes
+2. Navbar scrolled-state color changes
+3. Menu thumbnail styling changes
+4. People-count changes
+5. New detail pages and new menu items added
+6. New image paths generated
+7. Quote form field changes
+8. Validation behavior updates
+9. Typecheck result
+10. Build result
+11. Remaining work
+
+Leave all changes uncommitted for review.

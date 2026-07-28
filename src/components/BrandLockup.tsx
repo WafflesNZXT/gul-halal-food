@@ -3,17 +3,23 @@ import { cn } from "@/lib/utils";
 
 type BrandLockupProps = {
   variant?: "header" | "footer" | "compact";
+  scrolled?: boolean;
   className?: string;
 };
 
 const grandmotherCutout = `${import.meta.env.BASE_URL.replace(/\/$/, "")}/brand/gul-grandmother-cutout.webp`;
 
-export function BrandLockup({ variant = "header", className }: BrandLockupProps) {
+export function BrandLockup({ variant = "header", scrolled = false, className }: BrandLockupProps) {
   const isFooter = variant === "footer";
   const isCompact = variant === "compact";
 
+  // When scrolled (dark green navbar): Gul, Halal, Pakistani Catering → white; Food → orange (unchanged)
+  const gulColor = isFooter ? "text-[#FFF8E8]" : scrolled ? "text-white" : "text-primary";
+  const halalColor = isFooter ? "text-[#DDE8C8]" : scrolled ? "text-white" : "text-primary";
+  const taglineColor = isFooter ? "text-[#DDE8C8]/85" : scrolled ? "text-white/90" : "text-primary/70";
+
   return (
-    <div className={cn("flex items-center", isCompact ? "gap-2" : "gap-3", className)}>
+    <div className={cn("flex items-center", isCompact ? "gap-1.5" : "gap-2.5", className)}>
       <img
         src={grandmotherCutout}
         alt="Illustrated grandmother serving a covered food platter for Gul Halal Food"
@@ -21,15 +27,48 @@ export function BrandLockup({ variant = "header", className }: BrandLockupProps)
         height={74}
         className={cn(
           "shrink-0 object-contain object-center",
-          isCompact ? "h-12 w-24" : "h-20 w-36 sm:h-[88px] sm:w-40",
+          isCompact ? "h-11 w-[4.5rem]" : "h-[4.5rem] w-32 sm:h-20 sm:w-36",
         )}
       />
-      <span className={cn("flex min-w-0 flex-col leading-none", isCompact ? "gap-0.5" : "gap-1") }>
-        <span className={cn("font-display font-bold tracking-tight", isFooter ? "text-[#FFF8E8]" : "text-primary", isCompact ? "text-xl" : "text-4xl")}>Gul</span>
-        <span className={cn("font-display font-bold tracking-tight", isCompact ? "text-base" : "text-2xl") }>
-          <span className={isFooter ? "text-[#DDE8C8]" : "text-primary"}>Halal </span><span className="text-secondary">Food</span>
+
+      {/* Wordmark — three lines with even visual spacing */}
+      <span
+        className={cn(
+          "flex min-w-0 flex-col leading-none",
+          isCompact ? "gap-[3px]" : "gap-[5px]",
+        )}
+      >
+        {/* "Gul" — shifted down a touch so the cap-height aligns with "Halal Food" */}
+        <span
+          className={cn(
+            "font-display font-bold tracking-tight block motion-safe:transition-colors motion-safe:duration-300",
+            gulColor,
+            isCompact ? "text-[1.25rem]" : "text-[2.1rem]",
+            isCompact ? "mt-[1px]" : "mt-[2px]",
+          )}
+        >
+          Gul
         </span>
-        <span className={cn("font-bold uppercase tracking-[0.16em]", isFooter ? "text-[#DDE8C8]/85" : "text-primary/75", isCompact ? "text-[0.48rem]" : "text-[0.58rem]")}>Pakistani Catering</span>
+
+        <span
+          className={cn(
+            "font-display font-bold tracking-tight block",
+            isCompact ? "text-[0.95rem]" : "text-[1.35rem]",
+          )}
+        >
+          <span className={cn("motion-safe:transition-colors motion-safe:duration-300", halalColor)}>Halal </span>
+          <span className="text-secondary">Food</span>
+        </span>
+
+        <span
+          className={cn(
+            "font-bold uppercase tracking-[0.16em] block motion-safe:transition-colors motion-safe:duration-300",
+            taglineColor,
+            isCompact ? "text-[0.46rem]" : "text-[0.54rem]",
+          )}
+        >
+          Pakistani Catering
+        </span>
       </span>
     </div>
   );

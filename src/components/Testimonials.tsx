@@ -3,6 +3,7 @@ import { useReducedMotion } from "framer-motion";
 import { Link } from "wouter";
 import { testimonials } from "@/data/testimonials";
 import { SectionHeading } from "./SectionHeading";
+import { Reveal } from "./Reveal";
 import { Star, Quote } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -30,19 +31,29 @@ export function Testimonials() {
   return (
     <section className="py-20 bg-card/30">
       <div className="container mx-auto px-4 md:px-6">
-        <SectionHeading 
-          title="Made with Love, Remembered with Joy" 
-          subtitle="Don't just take our word for it. Hear from the families and organizations we've had the pleasure of serving."
-          className="mb-16"
-        />
+        <Reveal>
+          <SectionHeading 
+            title="Made with Love, Remembered with Joy" 
+            subtitle="Don't just take our word for it. Hear from the families and organizations we've had the pleasure of serving."
+            className="mb-16"
+          />
+        </Reveal>
 
         {/* Desktop Grid View */}
         <div className="hidden lg:grid grid-cols-3 gap-8">
-          {previewTestimonials.map((t) => (
-            <TestimonialCard key={t.id} testimonial={t} />
+          {previewTestimonials.map((t, idx) => (
+            <Reveal key={t.id} delay={idx * 0.08}>
+              <TestimonialCard testimonial={t} />
+            </Reveal>
           ))}
         </div>
-        <div className="mt-10 text-center"><Link href="/testimonials" className="font-bold text-primary underline-offset-4 hover:text-secondary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary">Read Testimonials →</Link></div>
+        <Reveal delay={0.2}>
+          <div className="mt-10 text-center">
+            <Link href="/testimonials" className="font-bold text-primary underline-offset-4 hover:text-secondary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary">
+              Read Testimonials →
+            </Link>
+          </div>
+        </Reveal>
 
         {/* Mobile/Tablet Carousel View */}
         <div 
@@ -69,7 +80,7 @@ export function Testimonials() {
                 key={idx}
                 onClick={() => setActiveIndex(idx)}
                 className={cn(
-                  "w-3 h-3 rounded-full transition-colors",
+                  "w-3 h-3 rounded-full transition-colors cursor-pointer",
                   activeIndex === idx ? "bg-primary" : "bg-primary/20"
                 )}
                 aria-label={`Go to testimonial ${idx + 1}`}
@@ -90,7 +101,7 @@ function TestimonialCard({ testimonial }: { testimonial: typeof testimonials[0] 
       </div>
       
       <div className="flex gap-1 mb-4 mt-2">
-          {Array.from({ length: testimonial.rating ?? 0 }).map((_, i) => (
+        {Array.from({ length: testimonial.rating ?? 0 }).map((_, i) => (
           <Star key={i} size={18} className="text-accent fill-accent" />
         ))}
       </div>

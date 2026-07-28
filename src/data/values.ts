@@ -3,7 +3,7 @@ export type ValueItem = {
   title: string;
   description: string;
   iconName: string;
-  colorTheme: "sage" | "cream" | "golden" | "ivory";
+  colorTheme: "sage" | "cream" | "forest" | "ivory";
 };
 
 export const values: ValueItem[] = [
@@ -26,7 +26,7 @@ export const values: ValueItem[] = [
     title: "Family-Owned Since 1985",
     description: "Three generations of culinary heritage, sharing our family's table with yours.",
     iconName: "Home",
-    colorTheme: "golden"
+    colorTheme: "forest"
   },
   {
     id: "personal",

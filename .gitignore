@@ -18,3 +18,5 @@ pnpm-debug.log*
 .cache/
 .local/
 .DS_Store
+.vercel
+.env*.local

@@ -1,0 +1,471 @@
+Implement the next menu and form refinement pass for the Gul Halal Food website.
+
+Inspect the current project before editing. Preserve the existing multi-page structure, menu routing, dish-detail pages, cart architecture, hero design, truthful pricing behavior, accessibility improvements, and working Vite/React/TypeScript setup.
+
+Run first:
+- npm run typecheck
+- npm run build
+
+Preserve a passing state throughout the task.
+
+Do not rebuild the site from scratch.
+
+==================================================
+1. REMOVE THE REMAINING QUOTE FORM FIELDS
+==================================================
+
+The request quote / request order form still incorrectly shows:
+- Estimated Guest Count
+- Preferred Dishes & Ideas
+
+Remove both of those fields completely.
+
+Also confirm that these fields are not rendered anywhere in the active quote/order form:
+- Estimated Guest Count
+- Preferred Dishes & Ideas
+
+Preserve the other required fields and existing validation behavior.
+
+Do not reintroduce those removed fields elsewhere.
+
+==================================================
+2. ADD A LARGE MENU EXPANSION
+==================================================
+
+Add the following items to the menu system, including:
+- centralized menu data
+- card display
+- detail pages
+- image paths
+- flavor highlights
+- spice info where appropriate
+- customization options where appropriate
+- cart integration
+- request-order integration
+
+Continue using truthful pricing behavior:
+- no fake prices
+- use “Contact for pricing” or existing truthful pending-pricing logic
+
+All new items must have:
+- proper slug
+- short description
+- long description
+- flavor highlights
+- image
+- route/detail page
+- menu card
+- cart compatibility
+- order-request compatibility
+
+==================================================
+3. NEW MENU ITEMS TO ADD
+==================================================
+
+A) Pulao
+Options:
+- Chicken
+- Beef
+- Mutter / Mutar Pulao (show that “mutter” or “mutar” means peas)
+- Afghani type
+- Mutton
+
+Requirements:
+- Menu title: Pulao
+- Add a required option selector for the pulao style/type
+- Explain clearly in the description that mutter/mutar means peas
+- If “Afghani type” is selected, present it as a style/type option
+- Add proper flavor highlights appropriate to pulao
+
+B) Plain White Rice
+Menu title:
+- Plain White Rice
+
+But customization options should include rice type:
+- Plain white rice
+- Zeera rice
+- Chinese fried rice
+- Tarka rice
+
+Requirements:
+- The menu item remains “Plain White Rice”
+- Add required rice-type selector
+- Detail page should explain that different rice styles are available
+
+C) Korma
+Options:
+- Chicken
+- Beef
+- Mutton
+
+Menu title:
+- Korma
+
+Requirements:
+- Add required protein selector
+- Proper description and highlights
+
+D) Aloo Gosht
+Show meaning:
+- Aloo means potato
+- Gosht means meat
+
+Options:
+- Beef
+- Mutton
+
+Menu title:
+- Aloo Gosht
+
+Requirements:
+- Explain the meaning in the description naturally
+- Required protein selector
+- Proper highlights
+
+E) Kofta Curry
+Options:
+- Chicken
+- Beef
+
+Menu title:
+- Kofta Curry
+
+Requirements:
+- Required protein selector
+- Proper description and highlights
+
+F) Achar Gosht
+Show meaning:
+- Gosht means meat
+
+Options:
+- Chicken
+- Beef
+- Mutton
+
+Menu title:
+- Achar Gosht
+
+Requirements:
+- Required protein selector
+- Description should explain the achar/pickled-spice flavor style
+- Proper highlights
+
+G) Nihari
+Protein:
+- Beef only
+
+Menu title:
+- Nihari
+
+Requirements:
+- No protein selector needed if only beef
+- Proper description and highlights
+
+H) Palak Aloo
+Show meaning:
+- Palak means spinach
+- Aloo means potato
+
+Menu title:
+- Palak Aloo
+
+Requirements:
+- Vegetarian dish
+- Proper description and highlights
+
+I) Fried Mixed Veggies
+Menu title:
+- Fried Mixed Veggies
+
+Requirements:
+- Vegetarian dish
+- Proper description and highlights
+
+J) Bangan
+Show meaning:
+- Bangan means eggplant
+
+Options / styles:
+- Standard
+- Afghani type
+- Bagareh type
+
+Menu title:
+- Bangan
+
+Requirements:
+- Required style selector
+- Explain what the available styles mean in a simple way
+- Proper highlights
+
+K) Curry Pakora
+Requirements:
+- Menu title: Curry Pakora
+- It can be served with rice
+- Add a rice-choice selector reusing the same rice options system when appropriate:
+  - Plain white rice
+  - Zeera rice
+  - Chinese fried rice
+  - Tarka rice
+- Proper description and highlights
+
+L) Daal
+There is currently a “Daal Chawal” item.
+Change it so the main item is just:
+- Daal
+
+Customization:
+1. Daal type:
+- Mixed daal
+- Mash daal
+- Chana daal
+
+2. Base choice:
+- Rice
+- Naan
+
+If base choice is Rice:
+- allow choosing which rice type from the rice options:
+  - Plain white rice
+  - Zeera rice
+  - Chinese fried rice
+  - Tarka rice
+
+If base choice is Naan:
+- allow choosing naan type:
+  - Regular naan
+  - Garlic naan
+
+Requirements:
+- Remove the old “Daal Chawal” presentation
+- Main menu title should now be “Daal”
+- Explain in the description that it can be served with rice or naan
+- Proper highlights
+
+M) Lahori Chany
+Menu title:
+- Lahori Chany
+
+Requirements:
+- Proper description and highlights
+- Appropriate spice level if applicable
+
+N) Halwa
+Show meanings naturally:
+- Sooji halwa
+- Gajar halwa (carrot)
+
+Menu title:
+- Halwa
+
+Options:
+- Sooji
+- Gajar
+
+Requirements:
+- Required type selector
+- Proper dessert description and highlights
+
+O) Falooda
+Menu title:
+- Falooda
+
+Customization:
+- Include jello? yes/no
+- Include ice cream? yes/no
+- If ice cream is selected, choose flavor:
+  - Strawberry
+  - Vanilla
+
+Requirements:
+- Conditional option behavior:
+  - only show ice-cream flavor selector when ice cream is included
+- Proper dessert description and highlights
+
+P) Zarda Rice
+Menu title:
+- Zarda Rice
+
+Requirements:
+- Dessert
+- Proper description and highlights
+
+Q) Sweet Custard with Fruit
+Menu title:
+- Sweet Custard with Fruit
+
+Requirements:
+- Dessert
+- Proper description and highlights
+
+==================================================
+4. IMAGE REQUIREMENTS FOR ALL NEW ITEMS
+==================================================
+
+Generate or prepare realistic images for all new menu items.
+
+Use the same visual direction already established for the menu:
+- photorealistic Pakistani food
+- traditional brown / dark-brown / copper / carved serving plate or bowl
+- consistent warm lighting
+- isolated transparent background
+- soft grounding shadow
+- no table
+- no room background
+- no hands
+- no people
+- no text
+- no labels
+- no emoji-style icons
+- no circle or oval image background
+- fully visible dish
+- consistent apparent scale and angle across the menu
+
+Every newly added item should have a proper image path and should render cleanly in:
+- homepage cards where applicable
+- full menu
+- detail page
+- cart thumbnail where applicable
+
+==================================================
+5. FLAVOR HIGHLIGHTS AND CUSTOMIZATION STRUCTURE
+==================================================
+
+Make sure each new item has sensible flavor highlights.
+
+Use centralized structured data for:
+- protein options
+- style options
+- rice options
+- naan options
+- dessert options
+- optional extras
+- conditional options
+
+Prefer reusable option systems rather than duplicating logic separately in each component.
+
+Examples:
+- a reusable rice-type option set
+- a reusable protein-choice option set
+- reusable naan-type options
+- reusable spice-choice selector
+- reusable conditional-option handling for Falooda
+
+==================================================
+6. ROUTING AND DETAIL PAGES
+==================================================
+
+Create detail pages for all new items using the same pattern as the existing dishes.
+
+Requirements:
+- each new item has a working route
+- menu cards link correctly to detail pages
+- detail pages include:
+  - title
+  - image
+  - short intro
+  - long description
+  - highlights
+  - customization controls where applicable
+  - spice information where applicable
+  - people count / catering count
+  - add-to-cart behavior
+  - request-order CTA
+  - back-to-menu or menu navigation link
+
+Do not break existing item routes.
+
+==================================================
+7. CART INTEGRATION
+==================================================
+
+All new items and all their customization options must work with the cart.
+
+Requirements:
+- unique cart line identity must include relevant configuration
+- examples:
+  - Daal + mixed daal + rice + zeera rice
+  - Daal + chana daal + naan + garlic naan
+  - Halwa + sooji
+  - Halwa + gajar
+  - Falooda + jello yes + ice cream no
+  - Falooda + jello yes + ice cream yes + strawberry
+- preserve existing people-count behavior
+- preserve existing spice selection behavior where relevant
+- preserve truthful pricing behavior
+
+==================================================
+8. ORDER REQUEST INTEGRATION
+==================================================
+
+All new items and configurations should flow into the request order / quote flow correctly.
+
+Requirements:
+- order summary reflects full configuration
+- no fake prices
+- no fake checkout
+- no fake payment
+- preserve honest disconnected-backend behavior
+
+==================================================
+9. SCOPE LIMITS
+==================================================
+
+Do not:
+- invent prices
+- add payment processing
+- add fake email delivery
+- break existing hero/nav/cart functionality
+- remove accessibility improvements
+- remove reduced-motion support
+- rebuild the website from scratch
+- commit or push automatically
+
+==================================================
+10. VALIDATION
+==================================================
+
+Run:
+- npm run typecheck
+- npm run build
+
+Then verify:
+- Estimated Guest Count is removed from the active request form
+- Preferred Dishes & Ideas is removed from the active request form
+- all newly requested menu items are present
+- each new item has a detail page
+- each new item has an image
+- Daal replaces the old Daal Chawal presentation
+- Daal supports:
+  - mixed daal / mash daal / chana daal
+  - rice or naan
+  - rice-type selection if rice
+  - naan-type selection if naan
+- Falooda supports:
+  - jello yes/no
+  - ice cream yes/no
+  - strawberry/vanilla only when ice cream is selected
+- Naan supports garlic option
+- Pulao supports its requested variants
+- Plain White Rice supports the different rice types
+- Curry Pakora supports rice-type choice
+- all new item configurations work in the cart
+- order/request integration still works
+- no horizontal overflow is introduced
+- all routes still render
+
+At completion report:
+1. Form fields removed
+2. New menu items added
+3. New routes added
+4. New option systems added
+5. New image paths generated
+6. Daal restructuring details
+7. Dessert option logic details
+8. Cart integration updates
+9. Typecheck result
+10. Build result
+11. Remaining work
+
+Leave all changes uncommitted for review.
