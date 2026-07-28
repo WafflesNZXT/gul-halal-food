@@ -187,6 +187,7 @@ export default function Quote() {
                           />
                         ))}
                       </div>
+                      <OrderTotal items={items} />
                     </div>
                   )}
 
@@ -356,14 +357,14 @@ export default function Quote() {
                     </div>
                   </div>
 
-                  <div className="pt-6 border-t border-border/50">
+                  <div className="pt-6 border-t border-border/50 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    {items.length > 0 && <QuickTotal items={items} />}
                     <Button
                       type="submit"
-                      className="w-full md:w-auto rounded-full bg-primary text-white hover:bg-primary/90 font-bold px-12 h-14 text-lg shadow-md float-right"
+                      className="w-full sm:w-auto rounded-full bg-primary text-white hover:bg-primary/90 font-bold px-12 h-14 text-lg shadow-md sm:ml-auto cursor-pointer"
                     >
                       {itemCount > 0 ? "Request This Order" : "Place Order"}
                     </Button>
-                    <div className="clear-both" />
                   </div>
                 </form>
               </>
@@ -372,6 +373,90 @@ export default function Quote() {
         </div>
       </section>
     </Layout>
+  );
+}
+
+// ─── helpers for totals ───────────────────────────────────────────────────────
+
+function calcTotal(items: CartItem[]) {
+  let total = 0;
+  let allPriced = true;
+  for (const item of items) {
+    if (typeof item.basePrice === "number") {
+      total += item.basePrice * item.quantity;
+    } else {
+      allPriced = false;
+    }
+  }
+  return { total, allPriced, anyPriced: total > 0 };
+}
+
+/** Breakdown table shown between dishes and contact info */
+function OrderTotal({ items }: { items: CartItem[] }) {
+  if (items.length === 0) return null;
+  const { total, allPriced } = calcTotal(items);
+
+  return (
+    <div className="rounded-xl border border-border bg-background px-4 py-4 space-y-2">
+      <h4 className="text-sm font-bold text-foreground/70 uppercase tracking-wider mb-3">
+        Order Summary
+      </h4>
+
+      {/* Per-item breakdown */}
+      <div className="space-y-1.5">
+        {items.map((item) => (
+          <div key={cartItemKey(item.config)} className="flex items-baseline justify-between gap-3 text-sm">
+            <span className="text-foreground/80 truncate">
+              {item.name}
+              {item.proteinLabel && (
+                <span className="text-foreground/50"> ({item.proteinLabel})</span>
+              )}
+              <span className="text-foreground/45 ml-1">× {item.quantity}</span>
+            </span>
+            {typeof item.basePrice === "number" ? (
+              <span className="font-semibold text-foreground shrink-0">
+                ${(item.basePrice * item.quantity).toFixed(2)}
+              </span>
+            ) : (
+              <span className="text-foreground/40 shrink-0 text-xs">Pricing pending</span>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {/* Divider + total */}
+      <div className="pt-2 border-t border-border flex items-center justify-between">
+        <span className="font-bold text-foreground">
+          {allPriced ? "Total" : "Estimated Total"}
+        </span>
+        {total > 0 ? (
+          <span className="font-bold text-lg text-primary">
+            ${total.toFixed(2)}
+            {!allPriced && <span className="text-xs font-normal text-foreground/50 ml-1">(partial)</span>}
+          </span>
+        ) : (
+          <span className="text-sm text-foreground/50">Confirmed with quote</span>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/** Compact total shown beside the submit button */
+function QuickTotal({ items }: { items: CartItem[] }) {
+  const { total, allPriced } = calcTotal(items);
+  return (
+    <div className="text-sm text-foreground/70">
+      {total > 0 ? (
+        <>
+          <span>{allPriced ? "Total: " : "Est. total: "}</span>
+          <span className="font-bold text-primary text-base">${total.toFixed(2)}</span>
+          {!allPriced && <span className="text-xs ml-1">(partial)</span>}
+        </>
+      ) : (
+        <span>Pricing will be confirmed with your quote</span>
+      )}
+    </div>
   );
 }
 
@@ -467,7 +552,7 @@ function CartSummaryLine({
       </div>
 
       {/* Row 2: stepper with typed input · price */}
-      <div className="flex items-center justify-between gap-3 pl-[52px]">
+      <div className="flex items-center justify-between gap-2 flex-wrap">
         {/* − input + stepper */}
         <div className="flex items-center gap-1.5">
           <button
