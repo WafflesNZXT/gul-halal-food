@@ -10,7 +10,14 @@ import type { CartItem, CartItemConfig, SpiceLevelValue } from "@/types/cart";
 // ─── helpers ─────────────────────────────────────────────────────────────────
 
 export function cartItemKey(cfg: CartItemConfig): string {
-  return [cfg.menuItemId, cfg.proteinChoice ?? "", cfg.spiceLevel].join("|");
+  const extrasStr = cfg.extras
+    ? Object.entries(cfg.extras)
+        .filter(([, v]) => v)
+        .sort(([a], [b]) => a.localeCompare(b))
+        .map(([k, v]) => `${k}=${v}`)
+        .join(",")
+    : "";
+  return [cfg.menuItemId, cfg.proteinChoice ?? "", cfg.spiceLevel, extrasStr].join("|");
 }
 
 // ─── state / reducer ─────────────────────────────────────────────────────────
@@ -130,7 +137,8 @@ function reducer(state: CartState, action: CartAction): CartState {
 
 // ─── localStorage persistence ────────────────────────────────────────────────
 
-const STORAGE_KEY = "gul-cart-v1";
+// Bumped to v2 — CartItemConfig now includes extras field
+const STORAGE_KEY = "gul-cart-v2";
 
 function loadCart(): CartState {
   try {

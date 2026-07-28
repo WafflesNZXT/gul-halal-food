@@ -5,6 +5,7 @@ export type CartItemConfig = {
   menuItemId: string;
   proteinChoice?: string; // id from MenuItem.proteinOptions
   spiceLevel: SpiceLevelValue;
+  extras?: Record<string, string>; // extra option selections keyed by ExtraOptionGroup.id
 };
 
 /** A single cart line */

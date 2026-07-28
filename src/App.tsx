@@ -33,6 +33,9 @@ function Router() {
       <Route path="/menu/beef-haleem">
         <Redirect to="/menu/haleem" />
       </Route>
+      <Route path="/menu/daal-chawal">
+        <Redirect to="/menu/daal" />
+      </Route>
       <Route path="/menu/:slug" component={DishDetail} />
       <Route path="/menu" component={Menu} />
       <Route path="/catering" component={Catering} />

@@ -28,7 +28,6 @@ export function CartDrawer() {
   const [, navigate] = useLocation();
 
   const allPriced = items.every((i) => typeof i.basePrice === "number");
-  const totalPeople = items.reduce((s, i) => s + i.quantity, 0);
   const subtotal = allPriced
     ? items.reduce((sum, i) => sum + (i.basePrice ?? 0) * i.quantity, 0)
     : null;
@@ -151,9 +150,25 @@ function CartLineItem({
   onProteinChange,
 }: CartLineItemProps) {
   const menuItem = menu.find((m) => m.id === item.config.menuItemId);
-  const canCustomiseSpice = menuItem?.spiceCustomizable !== false && (menuItem?.spiceLevel ?? 0) > 0;
+  const canCustomiseSpice =
+    menuItem?.spiceCustomizable !== false && (menuItem?.spiceLevel ?? 0) > 0;
   const proteinOptions = menuItem?.proteinOptions ?? [];
   const customizationLabel = menuItem?.customizationLabel ?? "Protein";
+
+  // Build a human-readable summary of extras
+  const extrasLines: string[] = [];
+  if (item.config.extras && menuItem?.extraOptions) {
+    for (const group of menuItem.extraOptions) {
+      const value = item.config.extras[group.id];
+      if (!value) continue;
+      if (group.type === "boolean") {
+        extrasLines.push(`${group.label}: ${value === "yes" ? "Yes" : "No"}`);
+      } else {
+        const opt = group.options?.find((o) => o.id === value);
+        if (opt) extrasLines.push(opt.label);
+      }
+    }
+  }
 
   return (
     <div className="rounded-2xl border border-border bg-background p-4 space-y-3">
@@ -177,6 +192,11 @@ function CartLineItem({
           {item.proteinLabel && (
             <p className="text-xs text-foreground/60 mt-0.5">
               {item.proteinLabel}
+            </p>
+          )}
+          {extrasLines.length > 0 && (
+            <p className="text-xs text-foreground/60 mt-0.5 leading-snug">
+              {extrasLines.join(" · ")}
             </p>
           )}
           {canCustomiseSpice && (

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Layout } from "@/components/Layout";
 import { PageHeader } from "@/components/PageHeader";
 import { useForm } from "react-hook-form";
@@ -6,13 +6,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { UtensilsCrossed, Trash2 } from "lucide-react";
-import { config } from "@/data/config";
-import { Order, OrderSubmissionResult, submitOrder } from "@/lib/order";
+import { submitOrder } from "@/lib/order";
+import type { Order, OrderSubmissionResult } from "@/lib/order";
 import { useCart, cartItemKey } from "@/contexts/CartContext";
 import { SpiceLevel } from "@/components/SpiceLevel";
 import type { CartItem } from "@/types/cart";
+import { menu } from "@/data/menu";
 
 const formSchema = z.object({
   fullName: z.string().min(2, "Name must be at least 2 characters"),
@@ -20,13 +20,43 @@ const formSchema = z.object({
   phone: z.string().min(10, "Please enter a valid phone number"),
   eventDate: z.string().min(1, "Please select an event date"),
   eventType: z.string().min(1, "Please select an event type"),
-  guestCount: z.coerce.number().positive("Please enter a guest count"),
   venue: z.string().optional(),
-  menuNotes: z.string().optional(),
   dietaryNeeds: z.string().optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
+
+/** Build a human-readable dish name including all configuration */
+function buildDishName(item: CartItem): string {
+  const menuItem = menu.find((m) => m.id === item.config.menuItemId);
+  const parts: string[] = [item.name];
+
+  if (item.proteinLabel) parts.push(`(${item.proteinLabel})`);
+
+  // Include extra option selections
+  if (item.config.extras && menuItem?.extraOptions) {
+    for (const group of menuItem.extraOptions) {
+      const value = item.config.extras[group.id];
+      if (!value) continue;
+      if (group.type === "boolean") {
+        if (value === "yes") parts.push(`+${group.label}`);
+      } else {
+        const opt = group.options?.find((o) => o.id === value);
+        if (opt) parts.push(opt.label);
+      }
+    }
+  }
+
+  // Include spice level for customisable items
+  if (menuItem?.spiceCustomizable !== false && (menuItem?.spiceLevel ?? 0) > 0) {
+    const spiceLabels: Record<number, string> = { 1: "Mild", 2: "Medium", 3: "Hot" };
+    parts.push(`— ${spiceLabels[item.config.spiceLevel] ?? "Medium"} spice`);
+  }
+
+  if (item.quantity > 1) parts.push(`×${item.quantity} people`);
+
+  return parts.join(" ");
+}
 
 export default function Quote() {
   const [submissionResult, setSubmissionResult] =
@@ -36,84 +66,42 @@ export default function Quote() {
     typeof window !== "undefined"
       ? new URLSearchParams(window.location.search).get("dish")
       : null;
-  const fromCart =
-    typeof window !== "undefined"
-      ? new URLSearchParams(window.location.search).get("from") === "cart"
-      : false;
 
   const { items, removeItem, updateQty, itemCount } = useCart();
-
-  // Build default menuNotes from cart items or ?dish param
-  function buildDefaultNotes(): string {
-    if (items.length > 0) {
-      return items
-        .map((item) => {
-          const parts = [item.name];
-          if (item.proteinLabel) parts.push(`(${item.proteinLabel})`);
-          const spiceLabels: Record<number, string> = {
-            1: "Mild",
-            2: "Medium",
-            3: "Hot",
-          };
-          parts.push(`— ${spiceLabels[item.config.spiceLevel] ?? "Medium"} spice`);
-          if (item.quantity > 1) parts.push(`x${item.quantity}`);
-          return parts.join(" ");
-        })
-        .join("\n");
-    }
-    if (requestedDish) return `I'm interested in ${requestedDish}.`;
-    return "";
-  }
 
   const {
     register,
     handleSubmit,
-    setValue,
     formState: { errors },
   } = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       eventType: "",
-      menuNotes: buildDefaultNotes(),
     },
   });
 
-  // Keep menuNotes in sync when cart changes
-  useEffect(() => {
-    if (items.length > 0) {
-      setValue("menuNotes", buildDefaultNotes());
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [items]);
-
   const onSubmit = async (data: FormValues) => {
-    const orderItems = items.map((item) => ({
-      dishSlug: item.config.menuItemId,
-      dishName: [
-        item.name,
-        item.proteinLabel ? `(${item.proteinLabel})` : "",
-        `— Spice ${item.config.spiceLevel}/3`,
-      ]
-        .filter(Boolean)
-        .join(" "),
-    }));
+    const orderItems =
+      items.length > 0
+        ? items.map((item) => ({
+            dishSlug: item.config.menuItemId,
+            dishName: buildDishName(item),
+          }))
+        : requestedDish
+        ? [
+            {
+              dishSlug: requestedDish
+                .toLowerCase()
+                .replace(/[^a-z0-9]+/g, "-")
+                .replace(/(^-|-$)/g, ""),
+              dishName: requestedDish,
+            },
+          ]
+        : [];
 
     const result = await submitOrder({
       ...data,
-      items:
-        orderItems.length > 0
-          ? orderItems
-          : requestedDish
-          ? [
-              {
-                dishSlug: requestedDish
-                  .toLowerCase()
-                  .replace(/[^a-z0-9]+/g, "-")
-                  .replace(/(^-|-$)/g, ""),
-                dishName: requestedDish,
-              },
-            ]
-          : [],
+      items: orderItems,
     });
     setSubmissionResult(result);
   };
@@ -174,6 +162,7 @@ export default function Quote() {
                 )}
 
                 <form
+                  noValidate
                   onSubmit={handleSubmit(onSubmit)}
                   className="space-y-8 relative z-10"
                 >
@@ -326,29 +315,7 @@ export default function Quote() {
                         )}
                       </div>
 
-                      <div className="space-y-2">
-                        <label
-                          htmlFor="guestCount"
-                          className="text-sm font-semibold text-foreground"
-                        >
-                          Estimated Guest Count *
-                        </label>
-                        <Input
-                          id="guestCount"
-                          type="number"
-                          min="1"
-                          placeholder="Estimated guests"
-                          className={`h-12 rounded-xl bg-background border-border ${errors.guestCount ? "border-destructive" : ""}`}
-                          {...register("guestCount")}
-                        />
-                        {errors.guestCount && (
-                          <p className="text-destructive text-sm mt-1">
-                            {errors.guestCount.message}
-                          </p>
-                        )}
-                      </div>
-
-                      <div className="space-y-2">
+                      <div className="space-y-2 md:col-span-2">
                         <label
                           htmlFor="venue"
                           className="text-sm font-semibold text-foreground"
@@ -358,40 +325,24 @@ export default function Quote() {
                         <Input
                           id="venue"
                           placeholder="e.g. Community Center, San Jose"
-                          className="h-12 rounded-xl bg-background border-border"
+                          className="h-12 rounded-xl bg-background border-border md:w-1/2"
                           {...register("venue")}
                         />
                       </div>
                     </div>
                   </div>
 
-                  {/* Menu Preferences Section */}
-                  <div className="space-y-6">
+                  {/* Dietary requirements */}
+                  <div className="space-y-4">
                     <h3 className="text-xl font-display text-foreground border-l-4 border-secondary pl-3">
-                      Menu & Preferences
+                      Dietary Requirements
                     </h3>
-
-                    <div className="space-y-2">
-                      <label
-                        htmlFor="menuNotes"
-                        className="text-sm font-semibold text-foreground"
-                      >
-                        Preferred Dishes & Ideas
-                      </label>
-                      <Textarea
-                        id="menuNotes"
-                        placeholder="Tell us what you have in mind! E.g. Biryani, Haleem, and Samosas for appetizers..."
-                        className="min-h-[120px] rounded-xl bg-background border-border resize-y"
-                        {...register("menuNotes")}
-                      />
-                    </div>
-
                     <div className="space-y-2">
                       <label
                         htmlFor="dietaryNeeds"
                         className="text-sm font-semibold text-foreground"
                       >
-                        Dietary Requirements
+                        Any dietary needs?
                       </label>
                       <Input
                         id="dietaryNeeds"
@@ -435,6 +386,23 @@ function CartSummaryLine({
   onRemove: () => void;
   onQtyChange: (delta: number) => void;
 }) {
+  const menuItem = menu.find((m) => m.id === item.config.menuItemId);
+
+  // Build extras display
+  const extrasLines: string[] = [];
+  if (item.config.extras && menuItem?.extraOptions) {
+    for (const group of menuItem.extraOptions) {
+      const value = item.config.extras[group.id];
+      if (!value) continue;
+      if (group.type === "boolean") {
+        if (value === "yes") extrasLines.push(group.label);
+      } else {
+        const opt = group.options?.find((o) => o.id === value);
+        if (opt) extrasLines.push(opt.label);
+      }
+    }
+  }
+
   return (
     <div className="flex items-center gap-3 rounded-xl border border-border bg-background px-4 py-3">
       {item.image && (
@@ -454,11 +422,20 @@ function CartSummaryLine({
             </span>
           )}
         </p>
+        {extrasLines.length > 0 && (
+          <p className="text-xs text-foreground/55 mt-0.5">
+            {extrasLines.join(" · ")}
+          </p>
+        )}
         <div className="flex items-center gap-2 mt-0.5">
-          <SpiceLevel level={item.config.spiceLevel} />
-          <span className="text-xs text-foreground/50">
-            {["", "Mild", "Medium", "Hot"][item.config.spiceLevel]} spice
-          </span>
+          {(menuItem?.spiceCustomizable !== false && (menuItem?.spiceLevel ?? 0) > 0) && (
+            <>
+              <SpiceLevel level={item.config.spiceLevel} />
+              <span className="text-xs text-foreground/50">
+                {["", "Mild", "Medium", "Hot"][item.config.spiceLevel]} spice
+              </span>
+            </>
+          )}
         </div>
       </div>
       <div className="flex items-center gap-2 shrink-0">
@@ -470,8 +447,8 @@ function CartSummaryLine({
         >
           −
         </button>
-        <span className="text-sm font-semibold w-4 text-center">
-          {item.quantity}
+        <span className="text-sm font-semibold w-10 text-center whitespace-nowrap">
+          {item.quantity} {item.quantity === 1 ? "person" : "people"}
         </span>
         <button
           type="button"

@@ -5,14 +5,13 @@ import { Layout } from "@/components/Layout";
 import { QuoteCTA } from "@/components/QuoteCTA";
 import { DishImage } from "@/components/DishImage";
 import { menu } from "@/data/menu";
+import type { ExtraOptionGroup } from "@/data/menu";
 import { Button } from "@/components/ui/button";
 import { SpiceLevel } from "@/components/SpiceLevel";
 import { SpiceLevelSelector } from "@/components/SpiceLevelSelector";
 import { useCart } from "@/contexts/CartContext";
 import { cartItemKey } from "@/contexts/CartContext";
 import type { SpiceLevelValue } from "@/types/cart";
-
-// Old slugs redirect handled in App.tsx; this component only handles resolved slugs.
 
 export default function DishDetail() {
   const [, params] = useRoute("/menu/:slug");
@@ -43,6 +42,7 @@ function DishDetailContent({ slug }: { slug: string }) {
 
   const canCustomiseSpice = dish.spiceCustomizable !== false && dish.spiceLevel > 0;
   const hasProteinOptions = (dish.proteinOptions?.length ?? 0) > 0;
+  const hasExtraOptions = (dish.extraOptions?.length ?? 0) > 0;
 
   const defaultSpice = (dish.spiceLevel >= 1 && dish.spiceLevel <= 3
     ? dish.spiceLevel
@@ -54,22 +54,69 @@ function DishDetailContent({ slug }: { slug: string }) {
   );
   const [peopleCount, setPeopleCount] = useState(1);
   const [addedFeedback, setAddedFeedback] = useState(false);
+  const [extras, setExtras] = useState<Record<string, string>>({});
+  const [showErrors, setShowErrors] = useState(false);
+
+  /** Whether an extra option group should be rendered right now */
+  function isExtraVisible(group: ExtraOptionGroup): boolean {
+    if (!group.showWhen) return true;
+    return extras[group.showWhen.field] === group.showWhen.value;
+  }
+
+  /** Update an extras field, clearing any dependent conditional fields */
+  function setExtraValue(field: string, value: string) {
+    setExtras((prev) => {
+      const next = { ...prev, [field]: value };
+      // Clear values whose showWhen condition is no longer satisfied
+      if (dish.extraOptions) {
+        for (const group of dish.extraOptions) {
+          if (
+            group.showWhen &&
+            next[group.showWhen.field] !== group.showWhen.value
+          ) {
+            delete next[group.id];
+          }
+        }
+      }
+      return next;
+    });
+  }
+
+  /** Required visible extra groups that have not yet been filled */
+  const pendingExtraGroups = (dish.extraOptions ?? []).filter((g) => {
+    if (!isExtraVisible(g)) return false;
+    if (g.required === false) return false;
+    return !extras[g.id];
+  });
 
   const proteinError = hasProteinOptions && selectedProtein === null;
   const spiceError = canCustomiseSpice && selectedSpice === null;
-  const canAdd = !proteinError && !spiceError;
+  const canAdd =
+    !proteinError && !spiceError && pendingExtraGroups.length === 0;
 
   const handleAddToCart = () => {
-    if (!canAdd) return;
+    if (!canAdd) {
+      setShowErrors(true);
+      return;
+    }
     const effectiveSpice = (selectedSpice ?? defaultSpice) as SpiceLevelValue;
     const proteinLabel =
       dish.proteinOptions?.find((p) => p.id === selectedProtein)?.label;
+
+    // Only persist extras that are currently visible (i.e. relevant)
+    const persistedExtras: Record<string, string> = {};
+    for (const group of dish.extraOptions ?? []) {
+      if (isExtraVisible(group) && extras[group.id]) {
+        persistedExtras[group.id] = extras[group.id];
+      }
+    }
 
     const item = {
       config: {
         menuItemId: dish.id,
         proteinChoice: selectedProtein ?? undefined,
         spiceLevel: effectiveSpice,
+        extras: Object.keys(persistedExtras).length > 0 ? persistedExtras : undefined,
       },
       quantity: peopleCount,
       name: dish.name,
@@ -146,7 +193,7 @@ function DishDetailContent({ slug }: { slug: string }) {
                     onChange={setSelectedSpice}
                     name={`dish-spice-${dish.id}`}
                   />
-                  {spiceError && (
+                  {showErrors && spiceError && (
                     <p className="text-xs text-destructive" role="alert">
                       Please choose a spice level.
                     </p>
@@ -177,13 +224,79 @@ function DishDetailContent({ slug }: { slug: string }) {
                       </button>
                     ))}
                   </div>
-                  {proteinError && (
+                  {showErrors && proteinError && (
                     <p className="text-xs text-destructive" role="alert">
                       Please make a selection.
                     </p>
                   )}
                 </div>
               )}
+
+              {/* Extra option groups */}
+              {hasExtraOptions &&
+                dish.extraOptions!.map((group) => {
+                  if (!isExtraVisible(group)) return null;
+
+                  const isRequired = group.required !== false;
+                  const hasError =
+                    showErrors && isRequired && !extras[group.id];
+
+                  return (
+                    <div key={group.id} className="mt-5 space-y-2">
+                      <p className="text-sm font-semibold text-foreground">
+                        {group.label}{" "}
+                        {isRequired && (
+                          <span className="text-destructive" aria-hidden="true">
+                            *
+                          </span>
+                        )}
+                      </p>
+
+                      {group.type === "boolean" ? (
+                        <div className="flex flex-wrap gap-2">
+                          {(["yes", "no"] as const).map((val) => (
+                            <button
+                              key={val}
+                              onClick={() => setExtraValue(group.id, val)}
+                              className={`rounded-full px-4 py-2 border font-medium text-sm transition-colors ${
+                                extras[group.id] === val
+                                  ? "bg-primary/10 border-primary text-primary font-semibold"
+                                  : "bg-card border-border text-foreground/70 hover:border-primary/50 hover:text-primary"
+                              }`}
+                              aria-pressed={extras[group.id] === val}
+                            >
+                              {val === "yes" ? "Yes" : "No"}
+                            </button>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="flex flex-wrap gap-2">
+                          {group.options!.map((opt) => (
+                            <button
+                              key={opt.id}
+                              onClick={() => setExtraValue(group.id, opt.id)}
+                              title={opt.description}
+                              className={`rounded-full px-4 py-2 border font-medium text-sm transition-colors ${
+                                extras[group.id] === opt.id
+                                  ? "bg-primary/10 border-primary text-primary font-semibold"
+                                  : "bg-card border-border text-foreground/70 hover:border-primary/50 hover:text-primary"
+                              }`}
+                              aria-pressed={extras[group.id] === opt.id}
+                            >
+                              {opt.label}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+
+                      {hasError && (
+                        <p className="text-xs text-destructive" role="alert">
+                          Please make a selection.
+                        </p>
+                      )}
+                    </div>
+                  );
+                })}
 
               {/* People count stepper */}
               <div className="mt-5 space-y-2">
@@ -266,7 +379,6 @@ function DishDetailContent({ slug }: { slug: string }) {
                 </span>
                 <Button
                   onClick={handleAddToCart}
-                  disabled={!canAdd}
                   className={`rounded-full font-bold transition-colors ${
                     addedFeedback
                       ? "bg-green-600 hover:bg-green-600 text-white"

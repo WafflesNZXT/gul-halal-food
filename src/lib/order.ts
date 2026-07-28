@@ -8,7 +8,7 @@ export type OrderDraft = {
   phone: string;
   eventDate: string;
   eventType: string;
-  guestCount: number;
+  guestCount?: number;
   venue?: string;
   menuNotes?: string;
   dietaryNeeds?: string;
