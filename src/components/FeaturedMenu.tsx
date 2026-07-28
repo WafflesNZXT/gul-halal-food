@@ -2,8 +2,6 @@ import React from "react";
 import { SectionHeading } from "./SectionHeading";
 import { MenuCard } from "./MenuCard";
 import { menu } from "@/data/menu";
-import { Button } from "@/components/ui/button";
-
 import { Link } from "wouter";
 
 export function FeaturedMenu() {
@@ -21,6 +19,7 @@ export function FeaturedMenu() {
             <MenuCard key={item.id} item={item} />
           ))}
         </div>
+        <div className="mt-10 text-center"><Link href="/menu" className="font-bold text-primary underline-offset-4 hover:text-secondary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary">View Full Menu →</Link></div>
       </div>
     </section>
   );

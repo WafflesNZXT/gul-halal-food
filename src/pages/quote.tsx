@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { UtensilsCrossed } from "lucide-react";
 import { config } from "@/data/config";
+import { Order, OrderSubmissionResult, submitOrder } from "@/lib/order";
 
 const formSchema = z.object({
   fullName: z.string().min(2, "Name must be at least 2 characters"),
@@ -25,7 +26,7 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 
 export default function Quote() {
-  const [showSubmissionNotice, setShowSubmissionNotice] = useState(false);
+  const [submissionResult, setSubmissionResult] = useState<OrderSubmissionResult | null>(null);
   const requestedDish = new URLSearchParams(window.location.search).get("dish");
 
   const {
@@ -40,9 +41,12 @@ export default function Quote() {
     }
   });
 
-  const onSubmit = (_data: FormValues) => {
-    // TODO: Send validated quote data to the approved email or backend integration.
-    setShowSubmissionNotice(true);
+  const onSubmit = async (data: FormValues) => {
+    const result = await submitOrder({
+      ...data,
+      items: requestedDish ? [{ dishSlug: requestedDish.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""), dishName: requestedDish }] : [],
+    });
+    setSubmissionResult(result);
   };
 
   return (
@@ -59,7 +63,7 @@ export default function Quote() {
             {/* Decorative background accent */}
             <div className="absolute top-0 right-0 w-64 h-64 bg-accent/5 rounded-full blur-3xl pointer-events-none -translate-y-1/2 translate-x-1/4"></div>
 
-            <>
+            {submissionResult?.status === "success" ? <OrderConfirmation order={submissionResult.order} receiptUrl={submissionResult.receiptUrl} emailStatusUrl={submissionResult.emailStatusUrl} statusUrl={submissionResult.statusUrl} /> : <>
                 <div className="flex items-center gap-4 mb-10 pb-8 border-b border-border/50">
                   <div className="w-14 h-14 bg-secondary text-white rounded-full flex items-center justify-center shrink-0 shadow-md">
                     <UtensilsCrossed size={28} />
@@ -70,9 +74,10 @@ export default function Quote() {
                   </div>
                 </div>
 
-                {showSubmissionNotice && <div role="status" className="mb-8 rounded-2xl border border-secondary/30 bg-secondary/10 p-4 text-sm text-foreground">
-                  Online quote submission is not connected yet. Your request has not been sent.
+                {submissionResult?.status === "not_configured" && <div role="status" className="mb-8 rounded-2xl border border-secondary/30 bg-secondary/10 p-4 text-sm text-foreground">
+                  Online ordering is not connected yet. Your information has not been sent, but this page is ready for future order submission.
                 </div>}
+                {submissionResult?.status === "error" && <div role="alert" className="mb-8 rounded-2xl border border-destructive/30 bg-destructive/10 p-4 text-sm text-foreground">{submissionResult.message}</div>}
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-8 relative z-10">
                   
                   {/* Contact Section */}
@@ -148,21 +153,26 @@ export default function Quote() {
                     <div className="space-y-2">
                       <label htmlFor="dietaryNeeds" className="text-sm font-semibold text-foreground">Dietary Requirements</label>
                       <Input id="dietaryNeeds" placeholder="E.g. Need 10 vegetarian portions, 5 gluten-free" className="h-12 rounded-xl bg-background border-border" {...register("dietaryNeeds")} />
-                      <p className="text-xs text-foreground/60 mt-1">Note: All our meat is 100% Halal by default.</p>
+                      <p className="text-xs text-foreground/60 mt-1">Gul Halal Food serves Pakistani halal catering.</p>
                     </div>
                   </div>
 
                   <div className="pt-6 border-t border-border/50">
                     <Button type="submit" className="w-full md:w-auto rounded-full bg-primary text-white hover:bg-primary/90 font-bold px-12 h-14 text-lg shadow-md float-right">
-                      Show Submission Status
+                      Place Order
                     </Button>
                     <div className="clear-both"></div>
                   </div>
                 </form>
-            </>
+            </>}
           </div>
         </div>
       </section>
     </Layout>
   );
+}
+
+function OrderConfirmation({ order, receiptUrl, emailStatusUrl, statusUrl }: { order: Order; receiptUrl?: string; emailStatusUrl?: string; statusUrl?: string }) {
+  const hasFollowUp = Boolean(receiptUrl || emailStatusUrl || statusUrl);
+  return <div className="py-12 text-center"><h2 className="text-4xl text-primary">Thank you</h2><p className="mx-auto mt-4 max-w-lg text-foreground/75">Your order request has been received.</p><div className="mx-auto mt-8 max-w-lg rounded-2xl border border-border bg-background p-5 text-left"><p><strong>Reference:</strong> {order.reference}</p><p><strong>Status:</strong> {order.status}</p><p><strong>Event date:</strong> {order.eventDate}</p>{order.items.length > 0 && <p><strong>Dishes:</strong> {order.items.map((item) => item.dishName).join(", ")}</p>}</div>{hasFollowUp ? <div className="mt-8 flex flex-wrap justify-center gap-3">{receiptUrl && <Button asChild><a href={receiptUrl}>Email receipt</a></Button>}{emailStatusUrl && <Button asChild><a href={emailStatusUrl}>Email order status page</a></Button>}{statusUrl && <Button asChild><a href={statusUrl}>View order status</a></Button>}</div> : <p className="mt-8 text-sm text-foreground/60">Email receipt and order-status actions are available after online ordering is connected.</p>}</div>;
 }

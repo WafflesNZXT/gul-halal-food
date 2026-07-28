@@ -1,7 +1,6 @@
 import React from "react";
 import { MenuItem } from "@/data/menu";
 import { Button } from "@/components/ui/button";
-import { Flame } from "lucide-react";
 import { Link } from "wouter";
 
 export function MenuCard({ item }: { item: MenuItem }) {
@@ -29,7 +28,7 @@ export function MenuCard({ item }: { item: MenuItem }) {
           ))}
         </div>
         <Button asChild variant="ghost" className="text-primary hover:text-primary hover:bg-primary/10 rounded-full font-semibold">
-          <Link href={`/quote?dish=${encodeURIComponent(item.name)}`}>Request pricing</Link>
+          {item.featured ? <Link href={`/menu/${item.slug}`}>View dish</Link> : <Link href={`/quote?dish=${encodeURIComponent(item.name)}`}>Request pricing</Link>}
         </Button>
       </div>
     </div>

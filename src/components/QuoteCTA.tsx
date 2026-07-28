@@ -2,14 +2,16 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { Phone, ArrowRight } from "lucide-react";
 import { config } from "@/data/config";
+import { WaveDivider } from "@/components/DecorativeFlourish";
 
 import { Link } from "wouter";
 
 export function QuoteCTA() {
   return (
-    <section className="py-24 relative overflow-hidden bg-[#DDE8C8]">
+    <section className="relative overflow-hidden bg-primary pb-24 pt-0">
+      <WaveDivider className="h-16 -mb-px text-primary md:h-24" />
       {/* Decorative floral/botanical background patterns */}
-      <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
+      <div className="absolute inset-0 opacity-10 pointer-events-none">
         <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <pattern id="leaf-pattern" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse">
@@ -17,12 +19,12 @@ export function QuoteCTA() {
               <path d="M50,20 L50,80" fill="none" stroke="currentColor" strokeWidth="2" />
             </pattern>
           </defs>
-          <rect x="0" y="0" width="100%" height="100%" fill="url(#leaf-pattern)" className="text-primary" />
+          <rect x="0" y="0" width="100%" height="100%" fill="url(#leaf-pattern)" className="text-[#DDE8C8]" />
         </svg>
       </div>
 
-      <div className="container mx-auto px-4 md:px-6 relative z-10">
-        <div className="bg-card/80 backdrop-blur-md max-w-4xl mx-auto rounded-[3rem] p-10 md:p-16 border-4 border-white text-center shadow-xl">
+      <div className="container mx-auto px-4 md:px-6 relative z-10 pt-16">
+        <div className="bg-card/95 backdrop-blur-md max-w-4xl mx-auto rounded-[3rem] p-10 md:p-16 border-4 border-white text-center shadow-xl">
           <div className="inline-flex items-center justify-center w-20 h-20 bg-secondary rounded-full text-white mb-8 shadow-lg">
             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M18 8h1a4 4 0 0 1 0 8h-1"></path>

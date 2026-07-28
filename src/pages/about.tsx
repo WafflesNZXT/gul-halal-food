@@ -20,11 +20,9 @@ export default function About() {
           <div className="flex flex-col lg:flex-row items-center gap-16 lg:gap-24">
             
             <div className="w-full lg:w-1/2 flex justify-center">
-              <div className="relative w-full max-w-lg aspect-square bg-card border-[12px] border-card shadow-2xl rounded-[3rem] overflow-hidden group">
-                <div className="absolute inset-0 bg-muted/20 flex flex-col items-center justify-center p-12 text-center border border-border border-dashed m-6 rounded-2xl group-hover:bg-muted/30 transition-colors">
-                  <img src={logoImg} alt="Gul Halal Food Logo" className="w-full max-w-[280px] h-auto object-contain mb-8 opacity-90 drop-shadow-md" />
-                  <p className="font-display text-xl text-primary/70">A legacy of flavor and family</p>
-                </div>
+              <div className="w-full max-w-lg">
+                <img src={logoImg} alt="Full Gul Halal Food official logo" className="w-full h-auto object-contain drop-shadow-md" />
+                <p className="mt-5 text-center font-display text-xl text-primary/70">A legacy of flavor and family</p>
               </div>
             </div>
 

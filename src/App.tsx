@@ -14,6 +14,9 @@ import Testimonials from '@/pages/testimonials';
 import Contact from '@/pages/contact';
 import Quote from '@/pages/quote';
 import { RouteMetadata } from '@/components/RouteMetadata';
+import DishDetail from '@/pages/dish-detail';
+import OrderStatusPage from '@/pages/order-status';
+import { ScrollToTop } from '@/components/ScrollToTop';
 
 const queryClient = new QueryClient();
 
@@ -21,6 +24,7 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={Home} />
+      <Route path="/menu/:slug" component={DishDetail} />
       <Route path="/menu" component={Menu} />
       <Route path="/catering" component={Catering} />
       <Route path="/about" component={About} />
@@ -28,6 +32,7 @@ function Router() {
       <Route path="/testimonials" component={Testimonials} />
       <Route path="/contact" component={Contact} />
       <Route path="/quote" component={Quote} />
+      <Route path="/order-status/:token" component={OrderStatusPage} />
       <Route component={NotFound} />
     </Switch>
   );
@@ -39,6 +44,7 @@ function App() {
       <TooltipProvider>
         <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, '')}>
           <RouteMetadata />
+          <ScrollToTop />
           <Router />
         </WouterRouter>
         <Toaster />

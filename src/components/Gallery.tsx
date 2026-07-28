@@ -3,15 +3,16 @@ import { gallery, GalleryCategory } from "@/data/gallery";
 import { SectionHeading } from "./SectionHeading";
 import { X, ChevronLeft, ChevronRight, Maximize2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Link } from "wouter";
 
-export function Gallery() {
+export function Gallery({ preview = false }: { preview?: boolean }) {
   const categories: GalleryCategory[] = ["All", "Food", "Weddings", "Family Events", "Catering Setups"];
   const [activeCategory, setActiveCategory] = useState<GalleryCategory>("All");
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
   const filteredGallery = gallery.filter(
     (item) => activeCategory === "All" || item.category === activeCategory
-  ).slice(0, 4); // Preview: show only 4 items on homepage
+  ).slice(0, 4);
 
   const openLightbox = (index: number) => setLightboxIndex(index);
   const closeLightbox = () => setLightboxIndex(null);
@@ -37,8 +38,7 @@ export function Gallery() {
           className="mb-10"
         />
 
-        {/* Filter Tabs */}
-        <div className="flex flex-wrap justify-center gap-2 mb-12">
+        {!preview && <div className="flex flex-wrap justify-center gap-2 mb-12">
           {categories.map((cat) => (
             <button
               key={cat}
@@ -53,16 +53,17 @@ export function Gallery() {
               {cat}
             </button>
           ))}
-        </div>
+        </div>}
 
         {/* Masonry-style Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 auto-rows-[200px]">
           {filteredGallery.map((item, index) => (
             <div
               key={item.id}
-              onClick={() => openLightbox(index)}
+              onClick={preview ? undefined : () => openLightbox(index)}
               className={cn(
-                "relative group cursor-pointer overflow-hidden rounded-2xl border border-border transition-transform hover:scale-[1.02]",
+                "relative group overflow-hidden rounded-2xl border border-border transition-transform",
+                preview ? "" : "cursor-pointer hover:scale-[1.02]",
                 item.placeholderColor,
                 item.aspectRatio === "portrait" ? "row-span-2" : "",
                 item.aspectRatio === "square" ? "col-span-1 row-span-1 sm:col-span-2 sm:row-span-2 md:col-span-1 md:row-span-1" : ""
@@ -77,6 +78,8 @@ export function Gallery() {
                 </svg>
               </div>
 
+              {preview && <span className="absolute bottom-3 left-3 rounded-full bg-card/90 px-3 py-1 text-xs font-semibold text-primary shadow-sm">Photo coming soon</span>}
+
               {/* Overlay */}
               <div className="absolute inset-0 bg-primary/80 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center p-4 text-center">
                 <Maximize2 className="text-white mb-3" size={28} />
@@ -86,10 +89,11 @@ export function Gallery() {
             </div>
           ))}
         </div>
+        {preview && <div className="mt-10 text-center"><Link href="/gallery" className="font-bold text-primary underline-offset-4 hover:text-secondary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary">View Full Gallery →</Link></div>}
       </div>
 
       {/* Lightbox */}
-      {lightboxIndex !== null && (
+      {!preview && lightboxIndex !== null && (
         <div
           className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-sm flex items-center justify-center p-4"
           onClick={closeLightbox}

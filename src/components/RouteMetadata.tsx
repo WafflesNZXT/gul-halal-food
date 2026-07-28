@@ -46,7 +46,11 @@ export function RouteMetadata() {
   const [location] = useLocation();
 
   useEffect(() => {
-    const metadata = pageMetadata[location] ?? pageMetadata["/"];
+    const metadata = location.startsWith("/menu/")
+      ? { title: "Menu Dish | Gul Halal Food", description: "Explore a Pakistani halal catering dish from Gul Halal Food." }
+      : location.startsWith("/order-status/")
+        ? { title: "Order Status | Gul Halal Food", description: "Order status will be available after online ordering is connected." }
+        : pageMetadata[location] ?? pageMetadata["/"];
     document.title = metadata.title;
     updateMeta('meta[name="description"]', metadata.description);
     updateMeta('meta[property="og:title"]', metadata.title);

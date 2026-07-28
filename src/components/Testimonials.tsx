@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useReducedMotion } from "framer-motion";
+import { Link } from "wouter";
 import { testimonials } from "@/data/testimonials";
 import { SectionHeading } from "./SectionHeading";
 import { Star, Quote } from "lucide-react";
@@ -8,6 +10,7 @@ export function Testimonials() {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const shouldReduceMotion = useReducedMotion();
 
   const previewTestimonials = testimonials.slice(0, 3);
 
@@ -16,13 +19,13 @@ export function Testimonials() {
   };
 
   useEffect(() => {
-    if (!isPaused) {
+    if (!isPaused && !shouldReduceMotion) {
       intervalRef.current = setInterval(nextSlide, 5000);
     }
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [isPaused, previewTestimonials.length]);
+  }, [isPaused, previewTestimonials.length, shouldReduceMotion]);
 
   return (
     <section className="py-20 bg-card/30">
@@ -39,6 +42,7 @@ export function Testimonials() {
             <TestimonialCard key={t.id} testimonial={t} />
           ))}
         </div>
+        <div className="mt-10 text-center"><Link href="/testimonials" className="font-bold text-primary underline-offset-4 hover:text-secondary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary">Read Testimonials →</Link></div>
 
         {/* Mobile/Tablet Carousel View */}
         <div 

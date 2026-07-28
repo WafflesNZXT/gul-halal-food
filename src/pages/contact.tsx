@@ -131,7 +131,7 @@ export default function Contact() {
                     </div>
                     
                     <Button type="submit" className="w-full rounded-full bg-primary text-white hover:bg-primary/90 font-bold h-14 text-lg shadow-md">
-                      Show Submission Status
+                      Check Message Status
                     </Button>
                   </form>
               </>

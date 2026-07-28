@@ -7,8 +7,7 @@ import {
   FaTwitter,
 } from "react-icons/fa";
 import { Link } from "wouter";
-
-const logoImg = `${import.meta.env.BASE_URL.replace(/\/$/, "")}/brand/gul-logo-full.webp`;
+import { BrandLockup } from "@/components/BrandLockup";
 
 export function Footer() {
   const hasContactDetails = Boolean(config.address || config.phone || config.email);
@@ -32,9 +31,7 @@ export function Footer() {
           
           {/* Column 1: Brand */}
           <div className="space-y-6">
-            <div className="bg-white/90 p-4 rounded-2xl inline-block shadow-sm">
-              <img src={logoImg} alt="Gul Halal Food Logo" className="h-16 w-auto object-contain" />
-            </div>
+            <BrandLockup variant="footer" className="max-w-[310px]" />
             <p className="text-[#DDE8C8]/80 leading-relaxed pr-4">
               Authentic Pakistani halal catering for your most cherished moments. Bringing family recipes to your table since 1985.
             </p>
