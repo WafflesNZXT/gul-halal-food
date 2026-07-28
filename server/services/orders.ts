@@ -20,7 +20,15 @@ async function uniqueReference(repository: OrderRepository) {
   throw new AppError(503, "SERVICE_UNAVAILABLE", "Order requests are temporarily unavailable. Please try again later.");
 }
 
-export async function createOrder(repository: OrderRepository, request: CreateOrderRequest): Promise<CreateOrderResponse> {
+export type CreateOrderOptions = {
+  publicBaseUrl?: string;
+};
+
+export async function createOrder(
+  repository: OrderRepository,
+  request: CreateOrderRequest,
+  options: CreateOrderOptions = {},
+): Promise<CreateOrderResponse> {
   const validatedItems = validateMenuOrderItems(request.items);
   if (validatedItems.issues.length) {
     throw new AppError(400, "VALIDATION_ERROR", "Please correct the selected dishes.", validatedItems.issues);
@@ -45,7 +53,8 @@ export async function createOrder(repository: OrderRepository, request: CreateOr
     items: validatedItems.items,
     createdAt: now,
   });
-  return { ...order, statusUrl: `/order-status/${token}` };
+  const statusPath = `/order-status/${token}`;
+  return { ...order, statusUrl: options.publicBaseUrl ? new URL(statusPath, options.publicBaseUrl).toString() : statusPath };
 }
 
 export async function getPublicOrderStatus(repository: OrderRepository, token: string): Promise<CustomerOrder> {

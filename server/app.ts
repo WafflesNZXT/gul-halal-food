@@ -14,7 +14,9 @@ export function createApp(repository?: OrderRepository) {
   app.use("/api", createOrdersRouter(repository));
   app.use("/api", notFoundApi);
 
-  if (process.env.NODE_ENV === "production") {
+  // Vercel serves Vite's static output directly. Keep this only for the
+  // standalone Node production server used outside Vercel.
+  if (process.env.NODE_ENV === "production" && !process.env.VERCEL) {
     const dist = path.resolve(process.cwd(), "dist");
     app.use(express.static(dist));
     app.get(/^(?!\/api\/).*/, (_req: any, res: any) => res.sendFile(path.join(dist, "index.html")));

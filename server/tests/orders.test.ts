@@ -6,6 +6,7 @@ import { AppError } from "../errors";
 import type { OrderRepository, StoredOrderInput } from "../repositories/orders";
 import { createOrder, getPublicOrderStatus, hashStatusToken } from "../services/orders";
 import { parseCreateOrder } from "../validation/orders";
+import { getMigrationDatabaseUrl, getPublicBaseUrl, getRuntimeDatabaseUrl } from "../env";
 import type { CreateOrderRequest, CustomerOrder } from "../../src/shared/orders";
 
 const validPayload: CreateOrderRequest = {
@@ -126,4 +127,30 @@ test("status tokens are stored only as hashes", async () => {
   const token = created.statusUrl.split("/").pop()!;
   assert.equal(repository.records.has(token), false);
   assert.equal(repository.records.has(hashStatusToken(token)), true);
+});
+
+test("database URLs use the runtime and migration precedence expected by Neon and Vercel", () => {
+  const environment = {
+    DATABASE_URL: "runtime-database-url",
+    POSTGRES_URL: "runtime-postgres-url",
+    DATABASE_URL_UNPOOLED: "migration-unpooled-url",
+    POSTGRES_URL_NON_POOLING: "migration-postgres-url",
+  } as NodeJS.ProcessEnv;
+  assert.equal(getRuntimeDatabaseUrl(environment), "runtime-database-url");
+  assert.equal(getMigrationDatabaseUrl(environment), "migration-unpooled-url");
+  assert.equal(getMigrationDatabaseUrl({ POSTGRES_URL: "runtime-postgres-url" }), "runtime-postgres-url");
+});
+
+test("public status links use configured, Vercel, or current request origins without a client secret", async () => {
+  const request = {
+    get(name: string) {
+      return { origin: "https://preview.example.vercel.app", host: "preview.example.vercel.app" }[name as "origin" | "host"];
+    },
+  };
+  assert.equal(getPublicBaseUrl(request, { VERCEL: "1" }), "https://preview.example.vercel.app");
+  assert.equal(getPublicBaseUrl(undefined, { VERCEL_URL: "gul-halal-food.vercel.app" }), "https://gul-halal-food.vercel.app");
+  assert.equal(getPublicBaseUrl(undefined, { APP_BASE_URL: "https://catering.example.com/" }), "https://catering.example.com");
+
+  const result = await createOrder(new MemoryOrders(), parseCreateOrder(validPayload), { publicBaseUrl: "https://catering.example.com" });
+  assert.match(result.statusUrl, /^https:\/\/catering\.example\.com\/order-status\/[A-Za-z0-9_-]{43}$/);
 });
