@@ -10,6 +10,7 @@ export function createApp(repository?: OrderRepository) {
   app.disable("x-powered-by");
   app.use(helmet({ contentSecurityPolicy: false, crossOriginEmbedderPolicy: false }));
   app.use(express.json({ limit: "100kb", strict: true }));
+  app.get("/api/health", (_req: any, res: any) => res.json({ status: "ok" }));
   app.use("/api", createOrdersRouter(repository));
   app.use("/api", notFoundApi);
 

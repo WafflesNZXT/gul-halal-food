@@ -1,6 +1,8 @@
+import "./env";
 import { createApp } from "./app";
+import { getApiPort } from "./env";
 
-const port = Number(process.env.API_PORT ?? process.env.PORT ?? 5000);
+const port = getApiPort();
 const app = createApp();
 
 app.listen(port, "0.0.0.0", () => {

@@ -105,6 +105,21 @@ test("database failures receive a safe API response", async () => {
   }
 });
 
+test("health endpoint returns only a safe service status", async () => {
+  const app = createApp(new MemoryOrders());
+  const server = await new Promise<any>((resolve) => {
+    const instance = app.listen(0, "127.0.0.1", () => resolve(instance));
+  });
+  try {
+    const port = (server.address() as AddressInfo).port;
+    const response = await fetch(`http://127.0.0.1:${port}/api/health`);
+    assert.equal(response.status, 200);
+    assert.deepEqual(await response.json(), { status: "ok" });
+  } finally {
+    await new Promise<void>((resolve) => server.close(() => resolve()));
+  }
+});
+
 test("status tokens are stored only as hashes", async () => {
   const repository = new MemoryOrders();
   const created = await createOrder(repository, parseCreateOrder(validPayload));
