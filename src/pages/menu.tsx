@@ -39,7 +39,7 @@ export default function Menu() {
               Mobile: horizontally scrollable single row with shrink-0 pills
               Desktop: wrapping centered row */}
           <div
-            className="flex gap-2 overflow-x-auto pb-2 sm:flex-wrap sm:justify-center sm:overflow-x-visible sm:pb-0 sm:gap-3 -mx-4 px-4 sm:mx-0 sm:px-0 mb-8 sm:mb-12"
+            className="flex flex-wrap justify-center gap-3 mb-12"
             role="group"
             aria-label="Filter menu by category"
           >
