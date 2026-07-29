@@ -13,6 +13,7 @@ import { useCart, cartItemKey } from "@/contexts/CartContext";
 import { SpiceLevel } from "@/components/SpiceLevel";
 import type { CartItem } from "@/types/cart";
 import { menu } from "@/data/menu";
+import { CustomerTrackingActions } from "@/components/CustomerTrackingActions";
 
 const formSchema = z.object({
   fullName: z.string().min(2, "Name must be at least 2 characters"),
@@ -640,9 +641,8 @@ function OrderConfirmation({ order }: { order: Order & { statusUrl: string } }) 
           </p>
         )}
       </div>
-      <div className="mt-8 flex justify-center">
-        <Button asChild><a href={order.statusUrl}>View order status</a></Button>
-      </div>
+      <div className="mx-auto mt-8 max-w-lg text-left"><CustomerTrackingActions reference={order.reference} statusUrl={order.statusUrl} showViewButton /></div>
+      <p className="mt-3 text-sm text-foreground/70">You can return later using the Track Order link in the website menu.</p>
     </div>
   );
 }

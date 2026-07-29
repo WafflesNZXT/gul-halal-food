@@ -12,6 +12,16 @@ the catch-all entrypoint, so token validation, hashing, and safe API errors
 remain centralized. Run `npm run check:vercel-status-route` in CI or before a
 deployment to guard this filesystem route.
 
+`api/orders/lookup.ts` is the explicit Vercel Function for public order
+recovery. It delegates to the same Express routes and does not create, rotate,
+or expose customer status tokens. Run `npm run check:vercel-order-lookup`
+before deployment.
+
+The admin API uses explicit function entrypoints under `api/admin/`, including
+the nested order detail, status, notes, and price endpoints. They all delegate
+to the same Express app. Run `npm run check:vercel-admin-routes` before a
+deployment to confirm the complete filesystem route set is present.
+
 ## Local development
 
 1. Copy `.env.example` to `.env` and set `DATABASE_URL` to a Neon pooled URL.

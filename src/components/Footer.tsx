@@ -57,6 +57,7 @@ export function Footer() {
               <li><Link href="/menu" className="hover:text-secondary transition-colors inline-block hover:translate-x-1 duration-300">Featured Menu</Link></li>
               <li><Link href="/gallery" className="hover:text-secondary transition-colors inline-block hover:translate-x-1 duration-300">Event Gallery</Link></li>
               <li><Link href="/testimonials" className="hover:text-secondary transition-colors inline-block hover:translate-x-1 duration-300">Client Reviews</Link></li>
+              <li><Link href="/track-order" className="hover:text-secondary transition-colors inline-block hover:translate-x-1 duration-300">Track Order</Link></li>
             </ul>
           </div>
 

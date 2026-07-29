@@ -78,16 +78,20 @@ type OriginRequest = { get(name: string): string | undefined };
  * links on a custom or preview domain; VERCEL_URL is the safe fallback.
  */
 export function getPublicBaseUrl(request?: OriginRequest, environment: Environment = process.env) {
+  const requestOrigin = asHttpOrigin(request?.get("origin"));
+  // The order route accepts browser origins only after requireTrustedOrigin.
+  // This must win over APP_BASE_URL so a Preview/local confirmation always
+  // gets a status link on the page the customer is actually viewing.
+  if (requestOrigin) return requestOrigin;
+
   const configured = asHttpOrigin(environment.APP_BASE_URL);
   if (configured) return configured;
 
-  const requestOrigin = asHttpOrigin(request?.get("origin"));
   const requestHost = request?.get("x-forwarded-host") ?? request?.get("host");
   const forwardedProtocol = request?.get("x-forwarded-proto")?.split(",")[0]?.trim();
   const requestProtocol = forwardedProtocol === "http" ? "http" : "https";
   const requestBase = requestHost ? asHttpOrigin(`${requestProtocol}://${requestHost}`) : undefined;
 
-  if (requestOrigin && requestHost && new URL(requestOrigin).host === requestHost) return requestOrigin;
   if (environment.VERCEL && requestBase) return requestBase;
   return vercelOrigin(environment) ?? requestOrigin ?? requestBase;
 }

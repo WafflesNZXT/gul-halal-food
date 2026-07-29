@@ -21,10 +21,18 @@ export type StoredOrderInput = {
   createdAt: Date;
 };
 
+export type OrderLookupMatch = {
+  id: string;
+  customerEmail: string;
+  customerPhone: string;
+};
+
 export interface OrderRepository {
   referenceExists(reference: string): Promise<boolean>;
   create(input: StoredOrderInput): Promise<CustomerOrder>;
   findPublicByTokenHash(tokenHash: string): Promise<CustomerOrder | null>;
+  findByReferenceForLookup(reference: string): Promise<OrderLookupMatch | null>;
+  findCustomerSafeById(id: string): Promise<CustomerOrder | null>;
 }
 
 function asIso(value: Date | string): string {
@@ -98,6 +106,14 @@ export class PostgresOrderRepository implements OrderRepository {
     const found = await db.select().from(orders).where(eq(orders.statusTokenHash, tokenHash)).limit(1);
     const order = found[0];
     if (!order) return null;
+    return this.findCustomerSafeById(order.id);
+  }
+
+  async findCustomerSafeById(id: string): Promise<CustomerOrder | null> {
+    const db = getDatabase();
+    const found = await db.select().from(orders).where(eq(orders.id, id)).limit(1);
+    const order = found[0];
+    if (!order) return null;
     const [items, history] = await Promise.all([
       db.select().from(orderItems).where(eq(orderItems.orderId, order.id)),
       db.select().from(orderStatusHistory).where(eq(orderStatusHistory.orderId, order.id)).orderBy(asc(orderStatusHistory.changedAt)),
@@ -126,5 +142,12 @@ export class PostgresOrderRepository implements OrderRepository {
         changedAt: asIso(entry.changedAt),
       })),
     };
+  }
+
+  async findByReferenceForLookup(reference: string): Promise<OrderLookupMatch | null> {
+    const found = await getDatabase().select().from(orders).where(eq(orders.reference, reference)).limit(1);
+    const order = found[0];
+    if (!order) return null;
+    return { id: order.id, customerEmail: order.customerEmail, customerPhone: order.customerPhone };
   }
 }

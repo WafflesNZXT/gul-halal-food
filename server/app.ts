@@ -2,11 +2,13 @@ import path from "node:path";
 import express from "express";
 import helmet from "helmet";
 import { createOrdersRouter } from "./routes/orders.js";
+import { createAdminRouter } from "./routes/admin.js";
 import { errorHandler, notFoundApi } from "./middleware/errors.js";
 import { configureProxyTrust } from "./middleware/security.js";
 import type { OrderRepository } from "./repositories/orders.js";
+import type { AdminRepository } from "./repositories/admin.js";
 
-export function createApp(repository?: OrderRepository) {
+export function createApp(repository?: OrderRepository, adminRepository?: AdminRepository, environment: NodeJS.ProcessEnv = process.env) {
   const app = express();
   configureProxyTrust(app);
   app.disable("x-powered-by");
@@ -14,6 +16,7 @@ export function createApp(repository?: OrderRepository) {
   app.use(express.json({ limit: "100kb", strict: true }));
   app.get("/api/health", (_req: any, res: any) => res.json({ status: "ok" }));
   app.use("/api", createOrdersRouter(repository));
+  app.use("/api", createAdminRouter(adminRepository, environment));
   app.use("/api", notFoundApi);
 
   // Vercel serves Vite's static output directly. Keep this only for the

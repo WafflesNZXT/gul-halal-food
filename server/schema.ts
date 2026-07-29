@@ -17,11 +17,25 @@ export const orders = pgTable("orders", {
   venue: text("venue").notNull(),
   customerNotes: text("customer_notes"),
   dietaryNeeds: text("dietary_needs"),
+  adminNotes: text("admin_notes"),
+  quotedTotalCents: integer("quoted_total_cents"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 }, (table) => [
   uniqueIndex("orders_reference_unique").on(table.reference),
   uniqueIndex("orders_status_token_hash_unique").on(table.statusTokenHash),
+  index("orders_status_event_date_index").on(table.status, table.eventDate),
+]);
+
+export const adminSessions = pgTable("admin_sessions", {
+  id: text("id").primaryKey(),
+  tokenHash: text("token_hash").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+  lastSeenAt: timestamp("last_seen_at", { withTimezone: true }).notNull().defaultNow(),
+}, (table) => [
+  uniqueIndex("admin_sessions_token_hash_unique").on(table.tokenHash),
+  index("admin_sessions_expires_at_index").on(table.expiresAt),
 ]);
 
 export const orderItems = pgTable("order_items", {

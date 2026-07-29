@@ -40,3 +40,12 @@ export async function fetchOrderStatus(token: string): Promise<CustomerOrder> {
   }
   return payload as CustomerOrder;
 }
+
+export async function lookupOrder(reference: string, contact: string): Promise<CustomerOrder> {
+  const response = await fetch("/api/orders/lookup", { method: "POST", headers: { "Content-Type": "application/json" }, credentials: "same-origin", body: JSON.stringify({ reference, contact }) });
+  const payload: unknown = await response.json().catch(() => null);
+  if (!response.ok) {
+    throw Object.assign(new Error(isApiError(payload) ? payload.error.message ?? "We could not find an order matching those details." : "We could not find an order matching those details."), { status: response.status });
+  }
+  return payload as CustomerOrder;
+}
