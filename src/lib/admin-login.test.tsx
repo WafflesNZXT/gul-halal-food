@@ -3,6 +3,7 @@ import test from "node:test";
 import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { StaffLoginLink } from "../components/StaffLoginLink.js";
+import { AdminHomeLink } from "../components/admin/AdminHomeLink.js";
 import { ADMIN_ORDERS_ROUTE, getAdminLoginViewState } from "./admin-login.js";
 
 test("public footer staff link is visible and points to the existing admin login route", () => {
@@ -17,4 +18,10 @@ test("admin login session state redirects authenticated users and retains the fo
   assert.equal(getAdminLoginViewState({ isLoading: false, isFetching: false, isSuccess: true }), "authenticated");
   assert.equal(getAdminLoginViewState({ isLoading: false, isFetching: false, isSuccess: false }), "unauthenticated");
   assert.equal(ADMIN_ORDERS_ROUTE, "/admin/orders");
+});
+
+test("authenticated admin layout home action returns to the public website", () => {
+  const markup = renderToStaticMarkup(React.createElement(AdminHomeLink));
+  assert.match(markup, />Back to Website Home</);
+  assert.match(markup, /href="\/"/);
 });
