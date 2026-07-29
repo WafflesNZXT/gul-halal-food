@@ -17,6 +17,8 @@ export type StoredOrderInput = {
   venue: string;
   customerNotes?: string;
   dietaryNeeds?: string;
+  smsConsent?: boolean;
+  smsConsentAt?: Date;
   items: CustomerOrderItem[];
   createdAt: Date;
 };
@@ -62,6 +64,8 @@ export class PostgresOrderRepository implements OrderRepository {
         venue: input.venue,
         customerNotes: input.customerNotes,
         dietaryNeeds: input.dietaryNeeds,
+        smsConsent: input.smsConsent ?? false,
+        smsConsentAt: input.smsConsentAt ?? null,
         createdAt: input.createdAt,
         updatedAt: input.createdAt,
       });
@@ -76,7 +80,8 @@ export class PostgresOrderRepository implements OrderRepository {
         spiceLevel: item.spiceLevel,
         extras: item.extras,
         pricingLabel: item.pricingLabel,
-        unitPrice: null,
+        unitPriceCents: item.unitPriceCents ?? null,
+        lineTotalCents: item.lineTotalCents ?? null,
         createdAt: input.createdAt,
       })));
       await tx.insert(orderStatusHistory).values({
@@ -135,12 +140,15 @@ export class PostgresOrderRepository implements OrderRepository {
         spiceLevel: item.spiceLevel as SpiceLevel,
         extras: item.extras,
         pricingLabel: item.pricingLabel,
+        unitPriceCents: item.unitPriceCents ?? undefined,
+        lineTotalCents: item.lineTotalCents ?? undefined,
       })),
       statusHistory: history.map((entry) => ({
         previousStatus: entry.previousStatus,
         newStatus: entry.newStatus,
         changedAt: asIso(entry.changedAt),
       })),
+      quotedTotalCents: order.quotedTotalCents ?? undefined,
     };
   }
 

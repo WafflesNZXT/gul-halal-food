@@ -3,7 +3,8 @@ import { randomUUID } from "node:crypto";
 import type { AdminOrder, AdminOrderListResponse, AdminOrderSummary, AdminStatusGroup } from "../../src/shared/admin.js";
 import type { CustomerOrderItem, CustomerStatusHistoryEntry, OrderStatus, SpiceLevel } from "../../src/shared/orders.js";
 import { getDatabase } from "../db.js";
-import { adminSessions, orderItems, orders, orderStatusHistory } from "../schema.js";
+import { adminSessions, notificationDeliveries, orderItems, orders, orderStatusHistory } from "../schema.js";
+import type { AdminNotificationSummary, NotificationDeliverySummary } from "../../src/shared/notifications.js";
 import { ADMIN_STATUS_GROUPS } from "../../src/shared/admin.js";
 
 export type AdminSession = { id: string; tokenHash: string; expiresAt: Date; lastSeenAt: Date };
@@ -11,10 +12,14 @@ export type AdminOrderListOptions = { group?: AdminStatusGroup; search?: string;
 
 function asIso(value: Date | string) { return typeof value === "string" ? value : value.toISOString(); }
 function toItem(item: typeof orderItems.$inferSelect): CustomerOrderItem {
-  return { menuItemId: item.menuItemId, slug: item.slug, name: item.displayName, peopleCount: item.peopleCount, proteinLabel: item.proteinLabel ?? undefined, spiceLevel: item.spiceLevel as SpiceLevel, extras: item.extras, pricingLabel: item.pricingLabel };
+  return { menuItemId: item.menuItemId, slug: item.slug, name: item.displayName, peopleCount: item.peopleCount, proteinLabel: item.proteinLabel ?? undefined, spiceLevel: item.spiceLevel as SpiceLevel, extras: item.extras, pricingLabel: item.pricingLabel, unitPriceCents: item.unitPriceCents ?? undefined, lineTotalCents: item.lineTotalCents ?? undefined };
 }
 function toHistory(entry: typeof orderStatusHistory.$inferSelect): CustomerStatusHistoryEntry {
   return { previousStatus: entry.previousStatus, newStatus: entry.newStatus, changedAt: asIso(entry.changedAt) };
+}
+function notificationSummary(rows: NotificationDeliverySummary[]): AdminNotificationSummary {
+  const select = (recipientType: "customer" | "admin", channel: "sms" | "email") => rows.filter((row) => row.recipientType === recipientType && row.channel === channel);
+  return { customerSms: select("customer", "sms"), customerEmail: select("customer", "email"), adminSms: select("admin", "sms"), adminEmail: select("admin", "email") };
 }
 
 export interface AdminRepository {
@@ -69,12 +74,13 @@ export class PostgresAdminRepository implements AdminRepository {
     const rows = await getDatabase().select().from(orders).where(eq(orders.reference, reference)).limit(1);
     const row = rows[0];
     if (!row) return null;
-    const [items, history] = await Promise.all([
+    const [items, history, deliveries] = await Promise.all([
       getDatabase().select().from(orderItems).where(eq(orderItems.orderId, row.id)),
       getDatabase().select().from(orderStatusHistory).where(eq(orderStatusHistory.orderId, row.id)).orderBy(asc(orderStatusHistory.changedAt)),
+      getDatabase().select().from(notificationDeliveries).where(eq(notificationDeliveries.orderId, row.id)),
     ]);
     const summary: AdminOrderSummary = { reference: row.reference, status: row.status, customerName: row.customerName, customerPhone: row.customerPhone, eventDate: row.eventDate, eventType: row.eventType, venue: row.venue, dishCount: items.length, totalPeople: items.reduce((sum, item) => sum + item.peopleCount, 0), createdAt: asIso(row.createdAt), updatedAt: asIso(row.updatedAt) };
-    return { ...summary, customerEmail: row.customerEmail, customerNotes: row.customerNotes ?? undefined, dietaryNeeds: row.dietaryNeeds ?? undefined, items: items.map(toItem), statusHistory: history.map(toHistory), adminNotes: row.adminNotes ?? undefined, quotedTotalCents: row.quotedTotalCents ?? undefined };
+    return { ...summary, customerEmail: row.customerEmail, customerNotes: row.customerNotes ?? undefined, dietaryNeeds: row.dietaryNeeds ?? undefined, items: items.map(toItem), statusHistory: history.map(toHistory), adminNotes: row.adminNotes ?? undefined, quotedTotalCents: row.quotedTotalCents ?? undefined, notifications: notificationSummary(deliveries.map((delivery) => ({ channel: delivery.channel, notificationType: delivery.notificationType, recipientType: delivery.recipientType, status: delivery.status, attemptCount: delivery.attemptCount }))) };
   }
   async updateStatus(reference: string, status: OrderStatus) {
     const current = await this.findOrder(reference);

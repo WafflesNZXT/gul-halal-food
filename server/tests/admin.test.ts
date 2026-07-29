@@ -8,7 +8,12 @@ import type { AdminRepository, AdminSession, AdminOrderListOptions } from "../re
 import { createSessionToken, hashAdminPassword, hashSessionToken, verifyAdminPassword } from "../services/admin-auth.js";
 
 const sampleOrder: AdminOrder = {
-  reference: "GHF-2026-ABC123", status: "received", customerName: "Amina Khan", customerEmail: "amina@example.com", customerPhone: "+15555555555", eventDate: "2026-08-20", eventType: "family", venue: "Community center", dishCount: 1, totalPeople: 25, createdAt: "2026-07-01T00:00:00.000Z", updatedAt: "2026-07-01T00:00:00.000Z", items: [{ menuItemId: "keer", slug: "keer", name: "Keer", peopleCount: 25, spiceLevel: 0, extras: {}, pricingLabel: "Contact for pricing" }], statusHistory: [{ previousStatus: null, newStatus: "received", changedAt: "2026-07-01T00:00:00.000Z" }], adminNotes: "Call before noon", quotedTotalCents: 45000,
+  reference: "GHF-2026-ABC123", status: "received", customerName: "Amina Khan", customerEmail: "amina@example.com", customerPhone: "+15555555555", eventDate: "2026-08-20", eventType: "family", venue: "Community center", dishCount: 1, totalPeople: 25, createdAt: "2026-07-01T00:00:00.000Z", updatedAt: "2026-07-01T00:00:00.000Z", items: [{ menuItemId: "keer", slug: "keer", name: "Keer", peopleCount: 25, spiceLevel: 0, extras: {}, pricingLabel: "Contact for pricing" }], statusHistory: [{ previousStatus: null, newStatus: "received", changedAt: "2026-07-01T00:00:00.000Z" }], adminNotes: "Call before noon", quotedTotalCents: 45000, notifications: {
+    customerSms: [{ channel: "sms", notificationType: "customer_order_confirmation", recipientType: "customer", status: "skipped_no_consent", attemptCount: 1 }],
+    customerEmail: [{ channel: "email", notificationType: "customer_order_confirmation", recipientType: "customer", status: "sent", attemptCount: 1 }],
+    adminSms: [{ channel: "sms", notificationType: "admin_new_order", recipientType: "admin", status: "failed", attemptCount: 1 }],
+    adminEmail: [{ channel: "email", notificationType: "admin_new_order", recipientType: "admin", status: "sent", attemptCount: 1 }],
+  },
 };
 
 class MemoryAdminRepository implements AdminRepository {
@@ -39,6 +44,17 @@ test("admin password hashes verify without retaining plaintext", async () => { c
 test("admin login creates an HttpOnly session and rejects invalid credentials generically", async () => withServer(async (base) => { const bad = await fetch(`${base}/api/admin/login`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ username: "wrong", password: "wrong" }) }); assert.equal(bad.status, 401); assert.equal((await bad.json()).error.message, "The username or password is not correct."); const { response, cookie } = await login(base); assert.equal(response.status, 200); assert.match(response.headers.get("set-cookie") ?? "", /HttpOnly;.*SameSite=Lax/i); assert.match(cookie, /^gul_admin_session=/); }));
 
 test("admin APIs require a live session, support search and revoke logout", async () => withServer(async (base) => { const unauthenticated = await fetch(`${base}/api/admin/orders`); assert.equal(unauthenticated.status, 401); const { cookie } = await login(base); const list = await fetch(`${base}/api/admin/orders?group=new&search=Amina`, { headers: { cookie } }); assert.equal(list.status, 200); assert.equal((await list.json()).orders[0].reference, sampleOrder.reference); const logout = await fetch(`${base}/api/admin/logout`, { method: "POST", headers: { cookie, "content-type": "application/json" }, body: "{}" }); assert.equal(logout.status, 204); const afterLogout = await fetch(`${base}/api/admin/orders`, { headers: { cookie } }); assert.equal(afterLogout.status, 401); }));
+
+test("protected order detail includes notification status while public shapes do not", async () => withServer(async (base) => {
+  const { cookie } = await login(base);
+  const response = await fetch(`${base}/api/admin/orders/${sampleOrder.reference}`, { headers: { cookie } });
+  assert.equal(response.status, 200);
+  const body = await response.json() as AdminOrder;
+  assert.equal(body.notifications.customerSms[0].status, "skipped_no_consent");
+  assert.equal(body.notifications.customerEmail[0].status, "sent");
+  const publicShape = { reference: body.reference, status: body.status, items: body.items };
+  assert.equal("notifications" in publicShape, false);
+}));
 
 test("admin updates preserve history and private fields never reach customer contracts", async () => withServer(async (base, repository) => { const { cookie } = await login(base); const headers = { cookie, "content-type": "application/json" }; const status = await fetch(`${base}/api/admin/orders/${sampleOrder.reference}/status`, { method: "PATCH", headers, body: JSON.stringify({ status: "cancelled" }) }); const updated = await status.json(); assert.equal(updated.status, "cancelled"); assert.equal(updated.statusHistory.length, 2); const duplicate = await fetch(`${base}/api/admin/orders/${sampleOrder.reference}/status`, { method: "PATCH", headers, body: JSON.stringify({ status: "cancelled" }) }); assert.equal((await duplicate.json()).statusHistory.length, 2); const notes = await fetch(`${base}/api/admin/orders/${sampleOrder.reference}/notes`, { method: "PATCH", headers, body: JSON.stringify({ adminNotes: "Private note" }) }); assert.equal((await notes.json()).adminNotes, "Private note"); const price = await fetch(`${base}/api/admin/orders/${sampleOrder.reference}/price`, { method: "PATCH", headers, body: JSON.stringify({ quotedTotalCents: 127550 }) }); assert.equal((await price.json()).quotedTotalCents, 127550); const invalidPrice = await fetch(`${base}/api/admin/orders/${sampleOrder.reference}/price`, { method: "PATCH", headers, body: JSON.stringify({ quotedTotalCents: -1 }) }); assert.equal(invalidPrice.status, 400); const publicShape = { reference: repository.order.reference, items: repository.order.items }; assert.equal("adminNotes" in publicShape, false); assert.equal("quotedTotalCents" in publicShape, false); assert.equal(publicShape.items[0].spiceLevel, 0); }));
 

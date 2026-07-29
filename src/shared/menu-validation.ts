@@ -25,6 +25,13 @@ export function validateMenuOrderItems(items: OrderItemInput[]): {
       issues.push({ path: `${path}.menuItemId`, message: "This dish is not available." });
       continue;
     }
+    const unitPriceCents = dish.unitPriceCents;
+    const lineTotalCents = unitPriceCents === undefined ? undefined : unitPriceCents * item.peopleCount;
+    if ((unitPriceCents !== undefined && (!Number.isSafeInteger(unitPriceCents) || unitPriceCents < 0))
+      || (lineTotalCents !== undefined && !Number.isSafeInteger(lineTotalCents))) {
+      issues.push({ path: `${path}.menuItemId`, message: "Pricing for this dish is temporarily unavailable." });
+      continue;
+    }
 
     const protein = dish.proteinOptions?.find((option) => option.id === item.proteinChoice);
     if (dish.proteinOptions?.length) {
@@ -83,6 +90,8 @@ export function validateMenuOrderItems(items: OrderItemInput[]): {
         spiceLevel: item.spiceLevel,
         extras,
         pricingLabel: dish.pricingLabel ?? dish.price,
+        unitPriceCents,
+        lineTotalCents,
       });
     }
   }

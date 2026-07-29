@@ -11,6 +11,7 @@ export const quoteFormSchema = z.object({
   eventType: z.string().trim().min(1, "Please select an event type."),
   venue: z.string().trim().min(2, "Enter a venue or city."),
   dietaryNeeds: z.string().optional(),
+  smsConsent: z.boolean().optional().default(false),
   website: z.string().optional(),
 });
 

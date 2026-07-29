@@ -49,6 +49,10 @@ Migrations resolve a direct connection in this order:
 
 All of these are server-only variables. Do not use a `VITE_` prefix.
 
+Order-notification provider setup and safe delivery-mode instructions are in
+`docs/order-notifications.md`. Notifications default to disabled and migrations
+remain deliberate.
+
 ## Migrations
 
 Migrations never run during a Vercel build or function invocation. Apply them

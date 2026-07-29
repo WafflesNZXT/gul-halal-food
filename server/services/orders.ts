@@ -4,6 +4,9 @@ import { validateMenuOrderItems } from "../../src/shared/menu-validation.js";
 import { AppError, notFound } from "../errors.js";
 import type { OrderRepository } from "../repositories/orders.js";
 import type { LookupRequest } from "../validation/lookup.js";
+import type { NotificationProvider } from "./notifications.js";
+import type { NotificationDeliveryRepository } from "../repositories/notifications.js";
+import { dispatchNewOrderNotifications } from "./notification-dispatch.js";
 
 export function hashStatusToken(token: string) {
   return createHash("sha256").update(token).digest("hex");
@@ -23,6 +26,9 @@ async function uniqueReference(repository: OrderRepository) {
 
 export type CreateOrderOptions = {
   publicBaseUrl?: string;
+  notificationProvider?: NotificationProvider;
+  notificationRepository?: NotificationDeliveryRepository;
+  environment?: NodeJS.ProcessEnv;
 };
 
 export async function createOrder(
@@ -36,10 +42,11 @@ export async function createOrder(
   }
 
   const reference = await uniqueReference(repository);
+  const orderId = randomUUID();
   const token = randomBytes(32).toString("base64url");
   const now = new Date();
   const order = await repository.create({
-    id: randomUUID(),
+    id: orderId,
     reference,
     status: "received",
     statusTokenHash: hashStatusToken(token),
@@ -51,11 +58,31 @@ export async function createOrder(
     venue: request.venue,
     customerNotes: request.customerNotes,
     dietaryNeeds: request.dietaryNeeds,
+    smsConsent: request.smsConsent ?? false,
+    smsConsentAt: request.smsConsent ? now : undefined,
     items: validatedItems.items,
     createdAt: now,
   });
   const statusPath = `/order-status/${token}`;
-  return { ...order, statusUrl: options.publicBaseUrl ? new URL(statusPath, options.publicBaseUrl).toString() : statusPath };
+  const statusUrl = options.publicBaseUrl ? new URL(statusPath, options.publicBaseUrl).toString() : statusPath;
+  if (options.notificationRepository) {
+    const adminUrl = options.publicBaseUrl ? new URL(`/admin/orders/${encodeURIComponent(reference)}`, options.publicBaseUrl).toString() : `/admin/orders/${encodeURIComponent(reference)}`;
+    try {
+      await dispatchNewOrderNotifications({
+        orderId,
+        order: {
+          reference, eventDate: request.eventDate, eventType: request.eventType, venue: request.venue,
+          customerName: request.customerName, customerEmail: request.customerEmail, customerPhone: request.customerPhone,
+          dietaryNeeds: request.dietaryNeeds, items: order.items,
+        },
+        statusUrl, adminUrl, smsConsent: request.smsConsent ?? false,
+        repository: options.notificationRepository,
+        provider: options.notificationProvider,
+        environment: options.environment,
+      });
+    } catch { /* post-commit notification persistence must not invalidate the order */ }
+  }
+  return { ...order, statusUrl };
 }
 
 export async function getPublicOrderStatus(repository: OrderRepository, token: string): Promise<CustomerOrder> {

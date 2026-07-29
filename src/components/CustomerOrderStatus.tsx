@@ -2,6 +2,7 @@ import React from "react";
 import { CheckCircle2, CircleAlert, Clock3 } from "lucide-react";
 import type { CustomerOrder, OrderStatus } from "@/shared/orders";
 import { getOrderStatusPresentation, inactiveOrderStatusClass } from "@/lib/order-status-presentation";
+import { PricingSummaryDisplay } from "@/components/PricingSummaryDisplay";
 
 const timeline: OrderStatus[] = ["received", "reviewing", "confirmed", "preparing", "ready", "completed"];
 const formatDate = (value: string, withTime = false) => new Intl.DateTimeFormat(undefined, withTime ? { dateStyle: "medium", timeStyle: "short" } : { dateStyle: "long" }).format(new Date(withTime ? value : `${value}T00:00:00`));
@@ -43,5 +44,6 @@ export function CustomerOrderStatus({ order, statusActions }: { order: CustomerO
       <h2 className="text-2xl text-primary">Selected dishes</h2>
       <div className="mt-5 divide-y divide-border/70">{order.items.map((item) => <div key={`${item.menuItemId}-${item.peopleCount}-${item.proteinLabel ?? ""}`} className="py-4 first:pt-0"><div className="flex flex-wrap items-baseline justify-between gap-2"><h3 className="font-display text-xl text-primary">{item.name}</h3><span className="font-semibold text-foreground/70">{item.peopleCount} {item.peopleCount === 1 ? "person" : "people"}</span></div><p className="mt-1 text-sm text-foreground/70">{[item.proteinLabel, item.spiceLevel > 0 ? `Spice level ${item.spiceLevel}` : undefined, ...Object.values(item.extras)].filter(Boolean).join(" · ") || "Standard preparation"}</p><p className="mt-1 text-xs text-foreground/55">{item.pricingLabel}</p></div>)}</div>
     </section>
+    <section className="rounded-3xl border border-border bg-card p-7 shadow-sm"><h2 className="text-2xl text-primary">Pricing</h2><div className="mt-5"><PricingSummaryDisplay items={order.items} quotedTotalCents={order.quotedTotalCents} showItems /></div></section>
   </div>;
 }
