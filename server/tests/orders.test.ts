@@ -60,6 +60,57 @@ test("valid order payload is accepted with a human reference and secure status l
   assert.equal(repository.records.size, 1);
 });
 
+test("Biryani alone succeeds", async () => {
+  const result = await createOrder(new MemoryOrders(), parseCreateOrder(validPayload));
+  assert.equal(result.items[0].name, "Biryani");
+  assert.equal(result.items[0].spiceLevel, 2);
+});
+
+test("Keer alone succeeds and preserves its non-spicy setting", async () => {
+  const result = await createOrder(new MemoryOrders(), parseCreateOrder({
+    ...validPayload,
+    items: [{ menuItemId: "keer", spiceLevel: 0, peopleCount: 25 }],
+  }));
+  assert.equal(result.items[0].name, "Keer");
+  assert.equal(result.items[0].spiceLevel, 0);
+});
+
+test("Biryani and Keer together succeed", async () => {
+  const result = await createOrder(new MemoryOrders(), parseCreateOrder({
+    ...validPayload,
+    items: [
+      validPayload.items[0],
+      { menuItemId: "keer", spiceLevel: 0, peopleCount: 25 },
+    ],
+  }));
+  assert.deepEqual(result.items.map((item) => item.name), ["Biryani", "Keer"]);
+});
+
+test("other non-spicy dishes succeed with their required configuration", async () => {
+  const result = await createOrder(new MemoryOrders(), parseCreateOrder({
+    ...validPayload,
+    items: [
+      { menuItemId: "gulab-jamun", spiceLevel: 0, peopleCount: 25 },
+      { menuItemId: "plain-white-rice", spiceLevel: 0, peopleCount: 25, extras: { riceType: "plain" } },
+      { menuItemId: "naan", proteinChoice: "regular", spiceLevel: 0, peopleCount: 25 },
+    ],
+  }));
+  assert.deepEqual(result.items.map((item) => item.name), ["Gulab Jamun", "Plain White Rice", "Naan"]);
+  assert.ok(result.items.every((item) => item.spiceLevel === 0));
+});
+
+test("invalid spice values are rejected according to the dish configuration", async () => {
+  const repository = new MemoryOrders();
+  await assert.rejects(
+    () => createOrder(repository, parseCreateOrder({ ...validPayload, items: [{ menuItemId: "keer", spiceLevel: 2, peopleCount: 25 }] })),
+    (error: unknown) => error instanceof AppError && error.statusCode === 400,
+  );
+  await assert.rejects(
+    () => createOrder(repository, parseCreateOrder({ ...validPayload, items: [{ ...validPayload.items[0], spiceLevel: 0 }] })),
+    (error: unknown) => error instanceof AppError && error.statusCode === 400,
+  );
+});
+
 test("empty carts and invalid people counts are rejected", () => {
   assert.throws(() => parseCreateOrder({ ...validPayload, items: [] }), (error: unknown) => error instanceof AppError && error.statusCode === 400);
   assert.throws(() => parseCreateOrder({ ...validPayload, items: [{ ...validPayload.items[0], peopleCount: 0 }] }), (error: unknown) => error instanceof AppError && error.statusCode === 400);
@@ -80,6 +131,18 @@ test("secure status lookup succeeds and excludes private customer fields", async
   assert.equal("customerEmail" in order, false);
   assert.equal("customerPhone" in order, false);
   assert.equal("statusTokenHash" in order, false);
+});
+
+test("customer status preserves Keer as non-spicy", async () => {
+  const repository = new MemoryOrders();
+  const created = await createOrder(repository, parseCreateOrder({
+    ...validPayload,
+    items: [{ menuItemId: "keer", spiceLevel: 0, peopleCount: 25 }],
+  }));
+  const token = created.statusUrl.split("/").pop()!;
+  const order = await getPublicOrderStatus(repository, token);
+  assert.equal(order.items[0].name, "Keer");
+  assert.equal(order.items[0].spiceLevel, 0);
 });
 
 test("invalid status tokens get the same safe not-found response", async () => {

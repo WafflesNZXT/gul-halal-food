@@ -11,11 +11,12 @@ export const ORDER_STATUSES = [
 
 export type OrderStatus = (typeof ORDER_STATUSES)[number];
 export type OrderActorType = "system" | "admin";
+export type SpiceLevel = 0 | 1 | 2 | 3;
 
 export type OrderItemInput = {
   menuItemId: string;
   proteinChoice?: string;
-  spiceLevel: 1 | 2 | 3;
+  spiceLevel: SpiceLevel;
   extras?: Record<string, string>;
   peopleCount: number;
 };
@@ -39,7 +40,7 @@ export type CustomerOrderItem = {
   name: string;
   peopleCount: number;
   proteinLabel?: string;
-  spiceLevel: 1 | 2 | 3;
+  spiceLevel: SpiceLevel;
   extras: Record<string, string>;
   pricingLabel: string;
 };

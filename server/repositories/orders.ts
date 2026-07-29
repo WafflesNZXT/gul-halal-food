@@ -1,6 +1,6 @@
 import { asc, eq } from "drizzle-orm";
 import { randomUUID } from "node:crypto";
-import type { CustomerOrder, CustomerOrderItem, OrderStatus } from "../../src/shared/orders.js";
+import type { CustomerOrder, CustomerOrderItem, OrderStatus, SpiceLevel } from "../../src/shared/orders.js";
 import { getDatabase } from "../db.js";
 import { orderItems, orders, orderStatusHistory } from "../schema.js";
 
@@ -116,7 +116,7 @@ export class PostgresOrderRepository implements OrderRepository {
         name: item.displayName,
         peopleCount: item.peopleCount,
         proteinLabel: item.proteinLabel ?? undefined,
-        spiceLevel: item.spiceLevel as 1 | 2 | 3,
+        spiceLevel: item.spiceLevel as SpiceLevel,
         extras: item.extras,
         pricingLabel: item.pricingLabel,
       })),

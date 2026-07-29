@@ -59,11 +59,37 @@ function buildDishName(item: CartItem): string {
   return parts.join(" ");
 }
 
+function getOrderErrorMessages(
+  result: Extract<OrderSubmissionResult, { status: "error" }>,
+  cartItems: CartItem[],
+): string[] {
+  const messages = new Set<string>();
+
+  for (const detail of result.details ?? []) {
+    const match = /^items\.(\d+)\.(.+)$/.exec(detail.path);
+    if (!match) continue;
+
+    const item = cartItems[Number(match[1])];
+    if (!item) continue;
+
+    if (match[2] === "spiceLevel") {
+      messages.add(`${item.name} has an invalid spice setting. Please remove it and add it again.`);
+    } else {
+      messages.add(`${item.name} has an invalid selection. Please remove it and add it again.`);
+    }
+  }
+
+  return messages.size > 0 ? [...messages] : [result.message];
+}
+
 export default function Quote() {
   const [submissionResult, setSubmissionResult] =
     useState<OrderSubmissionResult | null>(null);
 
   const { items, removeItem, updateQty, itemCount, clearCart } = useCart();
+  const submissionMessages = submissionResult?.status === "error"
+    ? getOrderErrorMessages(submissionResult, items)
+    : [];
 
   const {
     register,
@@ -137,7 +163,14 @@ export default function Quote() {
                     role="alert"
                     className="mb-8 rounded-2xl border border-destructive/30 bg-destructive/10 p-4 text-sm text-foreground"
                   >
-                    {submissionResult.message}
+                    <p>{submissionMessages[0]}</p>
+                    {submissionMessages.length > 1 && (
+                      <ul className="mt-2 list-disc space-y-1 pl-5">
+                        {submissionMessages.slice(1).map((message) => (
+                          <li key={message}>{message}</li>
+                        ))}
+                      </ul>
+                    )}
                   </div>
                 )}
 

@@ -44,9 +44,11 @@ function DishDetailContent({ slug }: { slug: string }) {
   const hasProteinOptions = (dish.proteinOptions?.length ?? 0) > 0;
   const hasExtraOptions = (dish.extraOptions?.length ?? 0) > 0;
 
-  const defaultSpice = (dish.spiceLevel >= 1 && dish.spiceLevel <= 3
-    ? dish.spiceLevel
-    : 2) as SpiceLevelValue;
+  const defaultSpice = (dish.spiceLevel === 0
+    ? 0
+    : dish.spiceLevel >= 1 && dish.spiceLevel <= 3
+      ? dish.spiceLevel
+      : 2) as SpiceLevelValue;
 
   const [selectedProtein, setSelectedProtein] = useState<string | null>(null);
   const [selectedSpice, setSelectedSpice] = useState<SpiceLevelValue | null>(

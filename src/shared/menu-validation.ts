@@ -1,10 +1,10 @@
 import { menu } from "../data/menu.js";
-import type { CustomerOrderItem, OrderItemInput } from "./orders.js";
+import type { CustomerOrderItem, OrderItemInput, SpiceLevel } from "./orders.js";
 
 export type MenuValidationIssue = { path: string; message: string };
 
-function defaultSpiceLevel(spiceLevel: number): 1 | 2 | 3 {
-  return (spiceLevel >= 1 && spiceLevel <= 3 ? spiceLevel : 1) as 1 | 2 | 3;
+function isSpicyLevel(spiceLevel: SpiceLevel): spiceLevel is 1 | 2 | 3 {
+  return spiceLevel >= 1 && spiceLevel <= 3;
 }
 
 /**
@@ -64,8 +64,12 @@ export function validateMenuOrderItems(items: OrderItemInput[]): {
       }
     }
 
-    const expectedSpice = defaultSpiceLevel(dish.spiceLevel);
-    if (dish.spiceCustomizable === false && item.spiceLevel !== expectedSpice) {
+    const isNonSpicyDish = dish.spiceLevel === 0 && dish.spiceCustomizable === false;
+    if (isNonSpicyDish && item.spiceLevel !== 0) {
+      issues.push({ path: `${path}.spiceLevel`, message: "This dish is not spicy and does not accept a spice setting." });
+    } else if (!isNonSpicyDish && !isSpicyLevel(item.spiceLevel)) {
+      issues.push({ path: `${path}.spiceLevel`, message: "Choose a spice level from mild, medium, or hot." });
+    } else if (dish.spiceCustomizable === false && item.spiceLevel !== dish.spiceLevel) {
       issues.push({ path: `${path}.spiceLevel`, message: "This dish does not support a custom spice level." });
     }
 
