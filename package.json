@@ -13,7 +13,7 @@
     "serve": "vite preview --config vite.config.ts --host 0.0.0.0",
     "start": "node --import tsx server/index.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.server.json --noEmit",
-    "test": "node --import tsx --test server/tests/orders.test.ts server/tests/admin.test.ts src/contexts/cart.test.ts src/lib/admin.test.ts src/lib/latest-order.test.ts src/lib/tracking-actions.test.ts src/lib/customer-status-refresh.test.ts",
+    "test": "node --import tsx --test server/tests/orders.test.ts server/tests/admin.test.ts src/contexts/cart.test.ts src/lib/admin.test.ts src/lib/latest-order.test.ts src/lib/tracking-actions.test.ts src/lib/customer-status-refresh.test.ts src/lib/quote-validation.test.ts src/lib/order-status-presentation.test.ts src/lib/admin-contact.test.ts",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "node --import tsx server/migrate.ts",
     "check:server-imports": "node scripts/check-server-imports.mjs",

@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Layout } from "@/components/Layout";
 import { PageHeader } from "@/components/PageHeader";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { UtensilsCrossed, Trash2 } from "lucide-react";
@@ -14,19 +13,7 @@ import { SpiceLevel } from "@/components/SpiceLevel";
 import type { CartItem } from "@/types/cart";
 import { menu } from "@/data/menu";
 import { CustomerTrackingActions } from "@/components/CustomerTrackingActions";
-
-const formSchema = z.object({
-  fullName: z.string().min(2, "Name must be at least 2 characters"),
-  email: z.string().email("Please enter a valid email address"),
-  phone: z.string().min(10, "Please enter a valid phone number"),
-  eventDate: z.string().min(1, "Please select an event date"),
-  eventType: z.string().min(1, "Please select an event type"),
-  venue: z.string().min(2, "Please enter a venue or city"),
-  dietaryNeeds: z.string().optional(),
-  website: z.string().optional(),
-});
-
-type FormValues = z.infer<typeof formSchema>;
+import { navigateToFirstInvalidQuoteField, quoteFormSchema, type FormValues } from "@/lib/quote-validation";
 
 /** Build a human-readable dish name including all configuration */
 function buildDishName(item: CartItem): string {
@@ -86,6 +73,8 @@ function getOrderErrorMessages(
 export default function Quote() {
   const [submissionResult, setSubmissionResult] =
     useState<OrderSubmissionResult | null>(null);
+  const [validationAttempted, setValidationAttempted] = useState(false);
+  const confirmationHeadingRef = useRef<HTMLHeadingElement>(null);
 
   const { items, removeItem, updateQty, itemCount, clearCart } = useCart();
   const submissionMessages = submissionResult?.status === "error"
@@ -95,15 +84,17 @@ export default function Quote() {
   const {
     register,
     handleSubmit,
+    setFocus,
     formState: { errors },
   } = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(quoteFormSchema),
     defaultValues: {
       eventType: "",
     },
   });
 
   const onSubmit = async (data: FormValues) => {
+    setValidationAttempted(false);
     const result = await submitOrder({
       customerName: data.fullName,
       customerEmail: data.email,
@@ -126,6 +117,22 @@ export default function Quote() {
     setSubmissionResult(result);
   };
 
+  const onInvalid = (invalidFields: typeof errors) => {
+    setValidationAttempted(true);
+    navigateToFirstInvalidQuoteField(
+      invalidFields,
+      (field) => setFocus(field),
+      window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false,
+    );
+  };
+
+  useEffect(() => {
+    if (submissionResult?.status !== "success") return;
+    const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
+    window.scrollTo({ top: 0, behavior: reducedMotion ? "auto" : "smooth" });
+    window.requestAnimationFrame(() => confirmationHeadingRef.current?.focus());
+  }, [submissionResult]);
+
   return (
     <Layout>
       <PageHeader
@@ -142,6 +149,7 @@ export default function Quote() {
             {submissionResult?.status === "success" ? (
               <OrderConfirmation
                 order={submissionResult.order}
+                headingRef={confirmationHeadingRef}
               />
             ) : (
               <>
@@ -175,9 +183,15 @@ export default function Quote() {
                   </div>
                 )}
 
+                {validationAttempted && Object.keys(errors).length > 0 && (
+                  <div role="alert" className="mb-8 rounded-2xl border border-destructive/30 bg-destructive/10 p-4 text-sm text-foreground">
+                    Please correct the highlighted fields below.
+                  </div>
+                )}
+
                 <form
                   noValidate
-                  onSubmit={handleSubmit(onSubmit)}
+                  onSubmit={handleSubmit(onSubmit, onInvalid)}
                   className="space-y-8 relative z-10"
                 >
                   {/* Cart summary */}
@@ -221,11 +235,13 @@ export default function Quote() {
                         <Input
                           id="fullName"
                           placeholder="Jane Doe"
-                          className={`h-12 rounded-xl bg-background border-border ${errors.fullName ? "border-destructive" : ""}`}
+                          aria-invalid={Boolean(errors.fullName)}
+                          aria-describedby={errors.fullName ? "fullName-error" : undefined}
+                          className={`h-12 scroll-mt-32 rounded-xl bg-background border-border ${errors.fullName ? "border-destructive bg-destructive/5 ring-1 ring-destructive/25 focus-visible:ring-destructive" : ""}`}
                           {...register("fullName")}
                         />
                         {errors.fullName && (
-                          <p className="text-destructive text-sm mt-1">
+                          <p id="fullName-error" className="text-destructive text-sm mt-1">
                             {errors.fullName.message}
                           </p>
                         )}
@@ -242,11 +258,13 @@ export default function Quote() {
                           id="email"
                           type="email"
                           placeholder="jane@example.com"
-                          className={`h-12 rounded-xl bg-background border-border ${errors.email ? "border-destructive" : ""}`}
+                          aria-invalid={Boolean(errors.email)}
+                          aria-describedby={errors.email ? "email-error" : undefined}
+                          className={`h-12 scroll-mt-32 rounded-xl bg-background border-border ${errors.email ? "border-destructive bg-destructive/5 ring-1 ring-destructive/25 focus-visible:ring-destructive" : ""}`}
                           {...register("email")}
                         />
                         {errors.email && (
-                          <p className="text-destructive text-sm mt-1">
+                          <p id="email-error" className="text-destructive text-sm mt-1">
                             {errors.email.message}
                           </p>
                         )}
@@ -263,11 +281,13 @@ export default function Quote() {
                           id="phone"
                           type="tel"
                           placeholder="Enter a phone number"
-                          className={`h-12 rounded-xl bg-background border-border md:w-1/2 ${errors.phone ? "border-destructive" : ""}`}
+                          aria-invalid={Boolean(errors.phone)}
+                          aria-describedby={errors.phone ? "phone-error" : undefined}
+                          className={`h-12 scroll-mt-32 rounded-xl bg-background border-border md:w-1/2 ${errors.phone ? "border-destructive bg-destructive/5 ring-1 ring-destructive/25 focus-visible:ring-destructive" : ""}`}
                           {...register("phone")}
                         />
                         {errors.phone && (
-                          <p className="text-destructive text-sm mt-1">
+                          <p id="phone-error" className="text-destructive text-sm mt-1">
                             {errors.phone.message}
                           </p>
                         )}
@@ -291,11 +311,13 @@ export default function Quote() {
                         <Input
                           id="eventDate"
                           type="date"
-                          className={`h-12 rounded-xl bg-background border-border ${errors.eventDate ? "border-destructive" : ""}`}
+                          aria-invalid={Boolean(errors.eventDate)}
+                          aria-describedby={errors.eventDate ? "eventDate-error" : undefined}
+                          className={`h-12 scroll-mt-32 rounded-xl bg-background border-border ${errors.eventDate ? "border-destructive bg-destructive/5 ring-1 ring-destructive/25 focus-visible:ring-destructive" : ""}`}
                           {...register("eventDate")}
                         />
                         {errors.eventDate && (
-                          <p className="text-destructive text-sm mt-1">
+                          <p id="eventDate-error" className="text-destructive text-sm mt-1">
                             {errors.eventDate.message}
                           </p>
                         )}
@@ -310,7 +332,9 @@ export default function Quote() {
                         </label>
                         <select
                           id="eventType"
-                          className={`flex h-12 w-full items-center justify-between rounded-xl border border-border bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${errors.eventType ? "border-destructive" : ""}`}
+                          aria-invalid={Boolean(errors.eventType)}
+                          aria-describedby={errors.eventType ? "eventType-error" : undefined}
+                          className={`flex h-12 w-full scroll-mt-32 items-center justify-between rounded-xl border border-border bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${errors.eventType ? "border-destructive bg-destructive/5 ring-1 ring-destructive/25 focus:ring-destructive" : ""}`}
                           {...register("eventType")}
                         >
                           <option value="" disabled>
@@ -324,7 +348,7 @@ export default function Quote() {
                           <option value="other">Other</option>
                         </select>
                         {errors.eventType && (
-                          <p className="text-destructive text-sm mt-1">
+                          <p id="eventType-error" className="text-destructive text-sm mt-1">
                             {errors.eventType.message}
                           </p>
                         )}
@@ -340,10 +364,12 @@ export default function Quote() {
                         <Input
                           id="venue"
                           placeholder="e.g. Community Center, San Jose"
-                          className={`h-12 rounded-xl bg-background border-border md:w-1/2 ${errors.venue ? "border-destructive" : ""}`}
+                          aria-invalid={Boolean(errors.venue)}
+                          aria-describedby={errors.venue ? "venue-error" : undefined}
+                          className={`h-12 scroll-mt-32 rounded-xl bg-background border-border md:w-1/2 ${errors.venue ? "border-destructive bg-destructive/5 ring-1 ring-destructive/25 focus-visible:ring-destructive" : ""}`}
                           {...register("venue")}
                         />
-                        {errors.venue && <p className="text-destructive text-sm mt-1">{errors.venue.message}</p>}
+                        {errors.venue && <p id="venue-error" className="text-destructive text-sm mt-1">{errors.venue.message}</p>}
                       </div>
                     </div>
                   </div>
@@ -617,10 +643,10 @@ function CartSummaryLine({
 
 // ─── Order confirmation ───────────────────────────────────────────────────────
 
-function OrderConfirmation({ order }: { order: Order & { statusUrl: string } }) {
+function OrderConfirmation({ order, headingRef }: { order: Order & { statusUrl: string }; headingRef: React.RefObject<HTMLHeadingElement | null> }) {
   return (
     <div className="py-12 text-center">
-      <h2 className="text-4xl text-primary">Thank you</h2>
+      <h2 ref={headingRef} tabIndex={-1} className="text-4xl text-primary focus:outline-none">Thank you</h2>
       <p className="mx-auto mt-4 max-w-lg text-foreground/75">
         Your order request has been received. Final availability and pricing will be confirmed separately.
       </p>

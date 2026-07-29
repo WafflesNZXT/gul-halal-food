@@ -1,6 +1,7 @@
 import React from "react";
 import { CheckCircle2, CircleAlert, Clock3 } from "lucide-react";
 import type { CustomerOrder, OrderStatus } from "@/shared/orders";
+import { getOrderStatusPresentation, inactiveOrderStatusClass } from "@/lib/order-status-presentation";
 
 const timeline: OrderStatus[] = ["received", "reviewing", "confirmed", "preparing", "ready", "completed"];
 const formatDate = (value: string, withTime = false) => new Intl.DateTimeFormat(undefined, withTime ? { dateStyle: "medium", timeStyle: "short" } : { dateStyle: "long" }).format(new Date(withTime ? value : `${value}T00:00:00`));
@@ -9,13 +10,14 @@ const titleCase = (value: string) => value.replace(/-/g, " ").replace(/\b\w/g, (
 export function CustomerOrderStatus({ order, statusActions }: { order: CustomerOrder; statusActions?: React.ReactNode }) {
   const cancelled = order.status === "cancelled";
   const index = timeline.indexOf(order.status);
+  const currentStatus = getOrderStatusPresentation(order.status);
 
   return <div className="space-y-8">
     <header className="rounded-3xl border border-border bg-card p-7 shadow-sm md:p-10">
       <p className="font-bold uppercase tracking-[0.18em] text-secondary">Order request</p>
       <div className="mt-3 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
         <div><h1 className="text-4xl text-primary md:text-5xl">{order.reference}</h1><p className="mt-2 text-foreground/75">Received {formatDate(order.createdAt, true)}</p></div>
-        <span className={`inline-flex w-fit rounded-full px-4 py-2 text-sm font-bold ${cancelled ? "bg-destructive/10 text-destructive" : "bg-primary/10 text-primary"}`}>{titleCase(order.status)}</span>
+        <span className={`inline-flex w-fit rounded-full px-4 py-2 text-sm font-bold ${currentStatus.badgeClass}`}>{currentStatus.label}</span>
       </div>
       <p className="mt-5 text-foreground/75">Your request is recorded. Final availability and pricing will be confirmed separately.</p>
       {statusActions && <div className="mt-6">{statusActions}</div>}
@@ -33,7 +35,8 @@ export function CustomerOrderStatus({ order, statusActions }: { order: CustomerO
       {cancelled ? <section className="rounded-3xl border border-destructive/30 bg-card p-7 shadow-sm"><h2 className="text-2xl text-primary">Status</h2><div className="mt-5 flex items-center gap-3 text-destructive"><CircleAlert /><span className="font-bold">This request was cancelled.</span></div></section> : <section className="rounded-3xl border border-border bg-card p-7 shadow-sm"><h2 className="text-2xl text-primary">Status timeline</h2><ol className="mt-5 space-y-4">{timeline.map((status, step) => {
         const history = order.statusHistory.find((entry) => entry.newStatus === status);
         const active = step <= index;
-        return <li key={status} className="flex gap-3"><span className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full ${active ? "bg-primary text-white" : "bg-muted text-muted-foreground"}`}>{active ? <CheckCircle2 size={15} /> : <Clock3 size={14} />}</span><div><p className={`font-semibold ${active ? "text-primary" : "text-foreground/55"}`}>{titleCase(status)}</p>{history && <p className="text-xs text-foreground/55">{formatDate(history.changedAt, true)}</p>}</div></li>;
+        const presentation = getOrderStatusPresentation(status);
+        return <li key={status} className="flex gap-3"><span className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full ${active ? presentation.markerClass : inactiveOrderStatusClass} ${status === order.status ? "ring-2 ring-offset-2 ring-current" : ""}`}>{active ? <CheckCircle2 size={15} /> : <Clock3 size={14} />}</span><div><p className={`font-semibold ${active ? presentation.textClass : "text-foreground/55"}`}>{presentation.label}</p>{history && <p className="text-xs text-foreground/55">{formatDate(history.changedAt, true)}</p>}</div></li>;
       })}</ol></section>}
     </div>
     <section className="rounded-3xl border border-border bg-card p-7 shadow-sm">
