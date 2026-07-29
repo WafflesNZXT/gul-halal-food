@@ -10,12 +10,12 @@ import type { AdminRepository } from "./repositories/admin.js";
 
 export function createApp(repository?: OrderRepository, adminRepository?: AdminRepository, environment: NodeJS.ProcessEnv = process.env) {
   const app = express();
-  configureProxyTrust(app);
+  configureProxyTrust(app, environment);
   app.disable("x-powered-by");
   app.use(helmet({ contentSecurityPolicy: false, crossOriginEmbedderPolicy: false }));
   app.use(express.json({ limit: "100kb", strict: true }));
   app.get("/api/health", (_req: any, res: any) => res.json({ status: "ok" }));
-  app.use("/api", createOrdersRouter(repository));
+  app.use("/api", createOrdersRouter(repository, undefined, environment));
   app.use("/api", createAdminRouter(adminRepository, environment));
   app.use("/api", notFoundApi);
 

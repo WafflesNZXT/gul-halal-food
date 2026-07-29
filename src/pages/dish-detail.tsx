@@ -124,7 +124,7 @@ function DishDetailContent({ slug }: { slug: string }) {
       name: dish.name,
       image: dish.image,
       pricingLabel: dish.pricingLabel ?? dish.price,
-      basePrice: dish.basePrice,
+      unitPriceCents: dish.unitPriceCents,
       proteinLabel,
     };
 

@@ -18,6 +18,6 @@ export type CartItem = {
   name: string;
   image?: string;
   pricingLabel?: string;
-  basePrice?: number; // undefined → pricing pending
+  unitPriceCents?: number; // undefined → pricing pending
   proteinLabel?: string; // human-readable protein name
 };

@@ -14,6 +14,8 @@ import type { CartItem } from "@/types/cart";
 import { menu } from "@/data/menu";
 import { CustomerTrackingActions } from "@/components/CustomerTrackingActions";
 import { navigateToFirstInvalidQuoteField, quoteFormSchema, type FormValues } from "@/lib/quote-validation";
+import { formatCents, pricingSummaryLines, resolveLineTotalCents, summarizePricing } from "@/shared/pricing";
+import { PricingSummaryDisplay } from "@/components/PricingSummaryDisplay";
 
 /** Build a human-readable dish name including all configuration */
 function buildDishName(item: CartItem): string {
@@ -103,6 +105,7 @@ export default function Quote() {
       eventType: data.eventType,
       venue: data.venue,
       dietaryNeeds: data.dietaryNeeds,
+      smsConsent: data.smsConsent,
       website: data.website,
       items: items.map((item) => ({ ...item.config, peopleCount: item.quantity })),
     });
@@ -397,6 +400,7 @@ export default function Quote() {
                       </p>
                     </div>
                   </div>
+                  <label className="flex items-start gap-3 rounded-xl border border-primary/15 bg-background p-4 text-sm text-foreground"><input type="checkbox" className="mt-1 h-5 w-5 shrink-0 accent-primary" {...register("smsConsent")} /><span><span className="block font-semibold">Text me updates about this order.</span>Message and data rates may apply. Reply STOP to unsubscribe.</span></label>
 
                   <div className="pt-6 border-t border-border/50 flex flex-col sm:flex-row items-center justify-between gap-4">
                     {items.length > 0 && <QuickTotal items={items} />}
@@ -421,22 +425,13 @@ export default function Quote() {
 // ─── helpers for totals ───────────────────────────────────────────────────────
 
 function calcTotal(items: CartItem[]) {
-  let total = 0;
-  let allPriced = true;
-  for (const item of items) {
-    if (typeof item.basePrice === "number") {
-      total += item.basePrice * item.quantity;
-    } else {
-      allPriced = false;
-    }
-  }
-  return { total, allPriced, anyPriced: total > 0 };
+  return summarizePricing(items.map((item) => ({ name: item.name, peopleCount: item.quantity, unitPriceCents: item.unitPriceCents })));
 }
 
 /** Breakdown table shown between dishes and contact info */
 function OrderTotal({ items }: { items: CartItem[] }) {
   if (items.length === 0) return null;
-  const { total, allPriced } = calcTotal(items);
+  const pricing = calcTotal(items);
 
   return (
     <div className="rounded-xl border border-border bg-background px-4 py-4 space-y-2">
@@ -455,9 +450,9 @@ function OrderTotal({ items }: { items: CartItem[] }) {
               )}
               <span className="text-foreground/45 ml-1">× {item.quantity}</span>
             </span>
-            {typeof item.basePrice === "number" ? (
+            {typeof item.unitPriceCents === "number" ? (
               <span className="font-semibold text-foreground shrink-0">
-                ${(item.basePrice * item.quantity).toFixed(2)}
+                {formatCents(resolveLineTotalCents({ name: item.name, peopleCount: item.quantity, unitPriceCents: item.unitPriceCents })!)}
               </span>
             ) : (
               <span className="text-foreground/40 shrink-0 text-xs">Pricing pending</span>
@@ -468,17 +463,9 @@ function OrderTotal({ items }: { items: CartItem[] }) {
 
       {/* Divider + total */}
       <div className="pt-2 border-t border-border flex items-center justify-between">
-        <span className="font-bold text-foreground">
-          {allPriced ? "Total" : "Estimated Total"}
-        </span>
-        {total > 0 ? (
-          <span className="font-bold text-lg text-primary">
-            ${total.toFixed(2)}
-            {!allPriced && <span className="text-xs font-normal text-foreground/50 ml-1">(partial)</span>}
-          </span>
-        ) : (
-          <span className="text-sm text-foreground/50">Confirmed with quote</span>
-        )}
+        <div className="space-y-1">
+          {pricingSummaryLines(pricing).map((line) => <p key={line} className="font-bold text-primary">{line}</p>)}
+        </div>
       </div>
     </div>
   );
@@ -486,18 +473,10 @@ function OrderTotal({ items }: { items: CartItem[] }) {
 
 /** Compact total shown beside the submit button */
 function QuickTotal({ items }: { items: CartItem[] }) {
-  const { total, allPriced } = calcTotal(items);
+  const pricing = calcTotal(items);
   return (
     <div className="text-sm text-foreground/70">
-      {total > 0 ? (
-        <>
-          <span>{allPriced ? "Total: " : "Est. total: "}</span>
-          <span className="font-bold text-primary text-base">${total.toFixed(2)}</span>
-          {!allPriced && <span className="text-xs ml-1">(partial)</span>}
-        </>
-      ) : (
-        <span>Pricing will be confirmed with your quote</span>
-      )}
+      {pricingSummaryLines(pricing).map((line) => <p key={line}>{line}</p>)}
     </div>
   );
 }
@@ -629,9 +608,9 @@ function CartSummaryLine({
         </div>
 
         {/* Price */}
-        {typeof item.basePrice === "number" ? (
+        {typeof item.unitPriceCents === "number" ? (
           <span className="text-sm font-semibold text-primary shrink-0">
-            ${(item.basePrice * item.quantity).toFixed(2)}
+            {formatCents(resolveLineTotalCents({ name: item.name, peopleCount: item.quantity, unitPriceCents: item.unitPriceCents })!)}
           </span>
         ) : (
           <span className="text-xs text-foreground/40 shrink-0">Pricing pending</span>
@@ -667,6 +646,7 @@ function OrderConfirmation({ order, headingRef }: { order: Order & { statusUrl: 
           </p>
         )}
       </div>
+      <div className="mx-auto mt-8 max-w-lg rounded-2xl border border-border bg-background p-5 text-left"><PricingSummaryDisplay items={order.items} quotedTotalCents={order.quotedTotalCents} showItems /></div>
       <div className="mx-auto mt-8 max-w-lg text-left"><CustomerTrackingActions reference={order.reference} statusUrl={order.statusUrl} showViewButton /></div>
       <p className="mt-3 text-sm text-foreground/70">You can return later using the Track Order link in the website menu.</p>
     </div>

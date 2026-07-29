@@ -10,6 +10,7 @@ import { parseCreateOrder } from "../validation/orders.js";
 import { getMigrationDatabaseUrl, getPublicBaseUrl, getRuntimeDatabaseUrl } from "../env.js";
 import { configureProxyTrust } from "../middleware/security.js";
 import type { CreateOrderRequest, CustomerOrder } from "../../src/shared/orders.js";
+import { menu } from "../../src/data/menu.js";
 
 const validPayload: CreateOrderRequest = {
   customerName: "Amina Khan",
@@ -79,6 +80,25 @@ test("Biryani alone succeeds", async () => {
   const result = await createOrder(new MemoryOrders(), parseCreateOrder(validPayload));
   assert.equal(result.items[0].name, "Biryani");
   assert.equal(result.items[0].spiceLevel, 2);
+});
+
+test("priced items save immutable unit-price and line-total snapshots", async () => {
+  const biryani = menu.find((item) => item.id === "biryani")!;
+  const previousPrice = biryani.unitPriceCents;
+  try {
+    biryani.unitPriceCents = 1200;
+    const result = await createOrder(new MemoryOrders(), parseCreateOrder({
+      ...validPayload,
+      items: [{ ...validPayload.items[0], peopleCount: 50 }],
+    }));
+    assert.equal(result.items[0].unitPriceCents, 1200);
+    assert.equal(result.items[0].lineTotalCents, 60000);
+    biryani.unitPriceCents = 1300;
+    assert.equal(result.items[0].unitPriceCents, 1200);
+    assert.equal(result.items[0].lineTotalCents, 60000);
+  } finally {
+    biryani.unitPriceCents = previousPrice;
+  }
 });
 
 test("Keer alone succeeds and preserves its non-spicy setting", async () => {
@@ -162,7 +182,7 @@ test("order recovery accepts a matching email or normalized phone without rotati
   assert.equal("customerEmail" in byEmail, false);
   assert.equal("customerPhone" in byEmail, false);
   assert.equal("adminNotes" in byEmail, false);
-  assert.equal("quotedTotalCents" in byEmail, false);
+  assert.equal("notificationDeliveries" in byEmail, false);
 });
 
 test("order recovery accepts formatted and digits-only phone pairs for ready, completed, and cancelled orders", async () => {
@@ -208,7 +228,7 @@ test("order lookup endpoint applies rate limiting and returns only customer-safe
     const body = await response.json() as Record<string, unknown>;
     assert.equal(response.status, 200);
     assert.ok(response.headers.get("ratelimit"));
-    for (const privateField of ["customerName", "customerEmail", "customerPhone", "statusTokenHash", "adminNotes", "quotedTotalCents"]) assert.equal(privateField in body, false);
+    for (const privateField of ["customerName", "customerEmail", "customerPhone", "statusTokenHash", "adminNotes", "notificationDeliveries"]) assert.equal(privateField in body, false);
   } finally { await new Promise<void>((resolve) => server.close(() => resolve())); }
 });
 
@@ -311,15 +331,68 @@ test("database URLs use the runtime and migration precedence expected by Neon an
   assert.equal(getMigrationDatabaseUrl({ POSTGRES_URL: "runtime-postgres-url" }), "runtime-postgres-url");
 });
 
-test("public status links use configured, Vercel, or current request origins without a client secret", async () => {
-  const request = {
-    get(name: string) {
-      return { origin: "https://preview.example.vercel.app", host: "preview.example.vercel.app" }[name as "origin" | "host"];
-    },
-  };
-  assert.equal(getPublicBaseUrl(request, { VERCEL: "1" }), "https://preview.example.vercel.app");
-  assert.equal(getPublicBaseUrl({ get: (name: string) => ({ origin: "https://www.gul.example", host: "internal.vercel.app" }[name as "origin" | "host"]) }, { VERCEL: "1" }), "https://www.gul.example");
-  assert.equal(getPublicBaseUrl({ get: (name: string) => name === "origin" ? "https://preview.example.vercel.app" : undefined }, { APP_BASE_URL: "https://www.gul.example" }), "https://preview.example.vercel.app");
+const originRequest = (headers: Record<string, string>) => ({
+  get(name: string) { return headers[name.toLowerCase()]; },
+});
+
+test("order creation rejects a malicious external browser origin", async () => {
+  const app = createApp(new MemoryOrders());
+  const server = await new Promise<any>((resolve) => {
+    const instance = app.listen(0, "127.0.0.1", () => resolve(instance));
+  });
+  try {
+    const port = (server.address() as AddressInfo).port;
+    const response = await fetch(`http://127.0.0.1:${port}/api/orders`, {
+      method: "POST",
+      headers: { "content-type": "application/json", origin: "https://malicious.example" },
+      body: JSON.stringify(validPayload),
+    });
+    assert.equal(response.status, 403);
+  } finally {
+    await new Promise<void>((resolve) => server.close(() => resolve()));
+  }
+});
+
+test("public status links prefer verified browser and forwarded public origins", async () => {
+  const localBase = getPublicBaseUrl(originRequest({
+    origin: "http://localhost:5173",
+    host: "localhost:5000",
+    "x-forwarded-proto": "http",
+  }), { APP_BASE_URL: "http://localhost:5173" });
+  assert.equal(localBase, "http://localhost:5173");
+  const localOrder = await createOrder(new MemoryOrders(), parseCreateOrder(validPayload), { publicBaseUrl: localBase });
+  assert.match(localOrder.statusUrl, /^http:\/\/localhost:5173\/order-status\/[A-Za-z0-9_-]{43}$/);
+
+  for (const browserOrigin of [
+    "https://gul-preview-abc.vercel.app",
+    "https://gulhalalfood.com",
+    "https://orders.gulhalalfood.com",
+  ]) {
+    const host = new URL(browserOrigin).host;
+    const publicBase = getPublicBaseUrl(originRequest({
+      origin: browserOrigin,
+      "x-forwarded-host": host,
+      "x-forwarded-proto": "https",
+    }), { VERCEL: "1", APP_BASE_URL: "https://wrong-config.example" });
+    assert.equal(publicBase, browserOrigin);
+    const order = await createOrder(new MemoryOrders(), parseCreateOrder(validPayload), { publicBaseUrl: publicBase });
+    assert.match(order.statusUrl, new RegExp(`^${browserOrigin.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}/order-status/[A-Za-z0-9_-]{43}$`));
+  }
+
+  assert.equal(getPublicBaseUrl(originRequest({
+    "x-forwarded-host": "gul-preview-abc.vercel.app",
+    "x-forwarded-proto": "https",
+  }), { APP_BASE_URL: "https://production.example" }), "https://gul-preview-abc.vercel.app");
+  assert.equal(getPublicBaseUrl(originRequest({
+    host: "internal-function.local",
+  }), { APP_BASE_URL: "https://production.example" }), "https://production.example");
+
+  assert.equal(getPublicBaseUrl(originRequest({
+    origin: "https://malicious.example",
+    "x-forwarded-host": "gulhalalfood.com",
+    "x-forwarded-proto": "https",
+  }), { APP_BASE_URL: "https://gulhalalfood.com" }), "https://gulhalalfood.com");
+
   assert.equal(getPublicBaseUrl(undefined, { VERCEL_URL: "gul-halal-food.vercel.app" }), "https://gul-halal-food.vercel.app");
   assert.equal(getPublicBaseUrl(undefined, { APP_BASE_URL: "https://catering.example.com/" }), "https://catering.example.com");
 

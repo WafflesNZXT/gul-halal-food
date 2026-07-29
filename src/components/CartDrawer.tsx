@@ -14,6 +14,7 @@ import { SpiceLevelSelector } from "@/components/SpiceLevelSelector";
 import type { CartItem } from "@/types/cart";
 import type { SpiceLevelValue } from "@/types/cart";
 import { menu } from "@/data/menu";
+import { formatCents, pricingSummaryLines, resolveLineTotalCents, summarizePricing } from "@/shared/pricing";
 
 export function CartDrawer() {
   const {
@@ -27,10 +28,11 @@ export function CartDrawer() {
   } = useCart();
   const [, navigate] = useLocation();
 
-  const allPriced = items.every((i) => typeof i.basePrice === "number");
-  const subtotal = allPriced
-    ? items.reduce((sum, i) => sum + (i.basePrice ?? 0) * i.quantity, 0)
-    : null;
+  const pricing = summarizePricing(items.map((item) => ({
+    name: item.name,
+    peopleCount: item.quantity,
+    unitPriceCents: item.unitPriceCents,
+  })));
 
   const handleRequestOrder = () => {
     closeCart();
@@ -96,27 +98,10 @@ export function CartDrawer() {
           <div className="border-t border-border px-5 py-5 space-y-4 shrink-0 bg-card">
             {/* Pricing summary */}
             <div className="space-y-1 text-sm">
-              {subtotal !== null ? (
-                <>
-                  <div className="flex justify-between">
-                    <span className="text-foreground/70">Subtotal</span>
-                    <span className="font-semibold">
-                      ${subtotal.toFixed(2)}
-                    </span>
-                  </div>
-                  <div className="flex justify-between font-bold text-base text-primary pt-1">
-                    <span>Estimated total</span>
-                    <span>${subtotal.toFixed(2)}</span>
-                  </div>
-                </>
-              ) : (
-                <div className="rounded-xl bg-muted/60 px-4 py-3 text-xs text-foreground/70 leading-relaxed">
-                  <span className="font-semibold text-foreground">
-                    Pricing pending.
-                  </span>{" "}
-                  Final pricing will be confirmed with your catering quote.
-                </div>
-              )}
+              <div className="rounded-xl bg-muted/60 px-4 py-3 text-sm text-foreground/70 leading-relaxed">
+                {pricingSummaryLines(pricing).map((line) => <p key={line} className="font-semibold text-foreground">{line}</p>)}
+                <p className="mt-1 text-xs">Final pricing will be confirmed with your catering quote.</p>
+              </div>
             </div>
 
             <Button
@@ -275,9 +260,9 @@ function CartLineItem({
           </button>
         </div>
         <div className="text-sm font-semibold text-right">
-          {typeof item.basePrice === "number" ? (
+          {typeof item.unitPriceCents === "number" ? (
             <span className="text-primary">
-              ${(item.basePrice * item.quantity).toFixed(2)}
+              {formatCents(resolveLineTotalCents({ name: item.name, peopleCount: item.quantity, unitPriceCents: item.unitPriceCents })!)}
             </span>
           ) : (
             <span className="text-foreground/50 text-xs">Pricing pending</span>

@@ -13,7 +13,13 @@ export function toSafeAbsoluteStatusUrl(value: unknown, origin: string): string 
   try {
     const url = new URL(value, origin);
     const token = /^\/order-status\/([^/]+)$/.exec(url.pathname)?.[1];
-    return url.origin === new URL(origin).origin && token && tokenPattern.test(token) ? url.toString() : null;
+    return url.origin === new URL(origin).origin
+      && !url.search
+      && !url.hash
+      && token
+      && tokenPattern.test(token)
+      ? url.toString()
+      : null;
   } catch { return null; }
 }
 

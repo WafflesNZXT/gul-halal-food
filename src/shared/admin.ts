@@ -1,4 +1,5 @@
 import type { CustomerOrderItem, CustomerStatusHistoryEntry, OrderStatus } from "./orders.js";
+import type { AdminNotificationSummary } from "./notifications.js";
 
 export const ADMIN_STATUS_GROUPS = {
   new: ["received", "reviewing"],
@@ -30,6 +31,7 @@ export type AdminOrder = AdminOrderSummary & {
   statusHistory: CustomerStatusHistoryEntry[];
   adminNotes?: string;
   quotedTotalCents?: number;
+  notifications: AdminNotificationSummary;
 };
 
 export type AdminOrderListResponse = {

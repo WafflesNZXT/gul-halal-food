@@ -1,5 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import React from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+import { CustomerTrackingActions } from "../components/CustomerTrackingActions.js";
 import { isSafeStatusUrl, toSafeAbsoluteStatusUrl } from "./latest-order.js";
 import { copyTextSafely, shareTrackingLink } from "./tracking-actions.js";
 
@@ -11,7 +14,7 @@ test("tracking actions accept only same-origin customer status URLs", () => {
   assert.equal(isSafeStatusUrl(relativeUrl, origin), true);
   assert.equal(isSafeStatusUrl(`${origin}${relativeUrl}`, origin), true);
   assert.equal(toSafeAbsoluteStatusUrl(relativeUrl, origin), `${origin}${relativeUrl}`);
-  for (const unsafe of ["https://outside.example/order-status/token", "javascript:alert(1)", "data:text/plain,hello", "/order-status/not-a-valid-token", "/quote"]) assert.equal(isSafeStatusUrl(unsafe, origin), false);
+  for (const unsafe of ["https://outside.example/order-status/token", "javascript:alert(1)", "data:text/plain,hello", "/order-status/not-a-valid-token", `${relativeUrl}?redirect=outside`, "/quote"]) assert.equal(isSafeStatusUrl(unsafe, origin), false);
 });
 
 test("copying a reference copies only the reference", async () => {
@@ -37,4 +40,33 @@ test("cancelled or unavailable sharing has the correct fallback behavior", async
   assert.deepEqual(copied, [`${origin}${relativeUrl}`]);
   const manual = await shareTrackingLink(reference, relativeUrl, origin, undefined, { writeText: async () => { throw new Error("blocked"); } });
   assert.equal(manual, "manual");
+});
+
+test("tracking actions render sharing only when a validated raw status URL exists", () => {
+  const descriptor = Object.getOwnPropertyDescriptor(globalThis, "window");
+  Object.defineProperty(globalThis, "window", {
+    configurable: true,
+    value: { location: { origin } },
+  });
+  try {
+    const withToken = renderToStaticMarkup(React.createElement(CustomerTrackingActions, {
+      reference,
+      statusUrl: relativeUrl,
+      showViewButton: true,
+      compact: true,
+    }));
+    assert.match(withToken, />View Order Status</);
+    assert.match(withToken, />Share Tracking Link</);
+    assert.match(withToken, />Copy Order Reference</);
+
+    const manuallyRecovered = renderToStaticMarkup(React.createElement(CustomerTrackingActions, {
+      reference,
+      compact: true,
+    }));
+    assert.doesNotMatch(manuallyRecovered, /Share Tracking Link|View Order Status/);
+    assert.match(manuallyRecovered, /Copy Order Reference/);
+  } finally {
+    if (descriptor) Object.defineProperty(globalThis, "window", descriptor);
+    else Reflect.deleteProperty(globalThis, "window");
+  }
 });

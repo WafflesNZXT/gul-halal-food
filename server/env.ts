@@ -73,25 +73,49 @@ function vercelOrigin(environment: Environment) {
 
 type OriginRequest = { get(name: string): string | undefined };
 
+function isLoopback(hostname: string) {
+  return hostname === "localhost" || hostname === "127.0.0.1" || hostname === "[::1]";
+}
+
+function configuredBrowserOrigins(environment: Environment) {
+  const origins = [
+    asHttpOrigin(environment.APP_BASE_URL),
+    environment.REPLIT_DEV_DOMAIN ? asHttpOrigin(`https://${environment.REPLIT_DEV_DOMAIN}`) : undefined,
+    ...(environment.REPLIT_DOMAINS ?? "").split(",").map((domain) => domain.trim()).filter(Boolean).map((domain) => asHttpOrigin(`https://${domain}`)),
+  ];
+  return new Set(origins.filter((origin): origin is string => Boolean(origin)));
+}
+
+function isVerifiedBrowserOrigin(requestOrigin: string, requestBase: string | undefined, environment: Environment) {
+  const originUrl = new URL(requestOrigin);
+  if (requestBase) {
+    const requestUrl = new URL(requestBase);
+    if (originUrl.host === requestUrl.host) return true;
+    // Vite proxies browser requests from 5173 to the local Express port.
+    if (isLoopback(originUrl.hostname) && isLoopback(requestUrl.hostname)) return true;
+  }
+  return configuredBrowserOrigins(environment).has(requestOrigin);
+}
+
 /**
- * Uses an explicit public URL first. On Vercel, a current request host keeps
- * links on a custom or preview domain; VERCEL_URL is the safe fallback.
+ * Browser-created orders stay on the verified browser origin. Requests
+ * without Origin use the forwarded public host before configured fallbacks.
  */
 export function getPublicBaseUrl(request?: OriginRequest, environment: Environment = process.env) {
   const requestOrigin = asHttpOrigin(request?.get("origin"));
-  // The order route accepts browser origins only after requireTrustedOrigin.
-  // This must win over APP_BASE_URL so a Preview/local confirmation always
-  // gets a status link on the page the customer is actually viewing.
-  if (requestOrigin) return requestOrigin;
+  const forwardedHost = request?.get("x-forwarded-host")?.split(",")[0]?.trim();
+  const directHost = request?.get("host");
+  const forwardedProtocol = request?.get("x-forwarded-proto")?.split(",")[0]?.trim();
+  const originProtocol = requestOrigin ? new URL(requestOrigin).protocol.replace(":", "") : undefined;
+  const requestProtocol = forwardedProtocol === "http" || forwardedProtocol === "https" ? forwardedProtocol : originProtocol ?? (environment.VERCEL ? "https" : "http");
+  const forwardedBase = forwardedHost ? asHttpOrigin(`${requestProtocol}://${forwardedHost}`) : undefined;
+  const directBase = directHost ? asHttpOrigin(`${requestProtocol}://${directHost}`) : undefined;
+  const requestBase = forwardedBase ?? directBase;
+
+  if (requestOrigin && isVerifiedBrowserOrigin(requestOrigin, requestBase, environment)) return requestOrigin;
+  if (forwardedBase) return forwardedBase;
 
   const configured = asHttpOrigin(environment.APP_BASE_URL);
   if (configured) return configured;
-
-  const requestHost = request?.get("x-forwarded-host") ?? request?.get("host");
-  const forwardedProtocol = request?.get("x-forwarded-proto")?.split(",")[0]?.trim();
-  const requestProtocol = forwardedProtocol === "http" ? "http" : "https";
-  const requestBase = requestHost ? asHttpOrigin(`${requestProtocol}://${requestHost}`) : undefined;
-
-  if (environment.VERCEL && requestBase) return requestBase;
-  return vercelOrigin(environment) ?? requestOrigin ?? requestBase;
+  return vercelOrigin(environment) ?? directBase;
 }

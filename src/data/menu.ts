@@ -31,7 +31,7 @@ export type MenuItem = {
   servingNotes?: string;
   image?: string;
   pricingLabel?: string;
-  basePrice?: number;
+  unitPriceCents?: number;
   featured?: boolean;
   available?: boolean;
   spiceLevel: number; // 0–3 suggested level

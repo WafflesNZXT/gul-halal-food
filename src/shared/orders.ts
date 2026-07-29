@@ -30,6 +30,7 @@ export type CreateOrderRequest = {
   venue: string;
   customerNotes?: string;
   dietaryNeeds?: string;
+  smsConsent?: boolean;
   items: OrderItemInput[];
   website?: string;
 };
@@ -43,6 +44,8 @@ export type CustomerOrderItem = {
   spiceLevel: SpiceLevel;
   extras: Record<string, string>;
   pricingLabel: string;
+  unitPriceCents?: number;
+  lineTotalCents?: number;
 };
 
 export type CustomerStatusHistoryEntry = {
@@ -61,6 +64,7 @@ export type CustomerOrder = {
   updatedAt: string;
   items: CustomerOrderItem[];
   statusHistory: CustomerStatusHistoryEntry[];
+  quotedTotalCents?: number;
 };
 
 export type CreateOrderResponse = CustomerOrder & { statusUrl: string };

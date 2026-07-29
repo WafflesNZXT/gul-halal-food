@@ -22,6 +22,7 @@ export const createOrderSchema = z.object({
   venue: trimmed(180),
   customerNotes: optionalTrimmed(3000),
   dietaryNeeds: optionalTrimmed(1500),
+  smsConsent: z.boolean().optional().default(false),
   items: z.array(itemSchema).min(1, "Add at least one dish.").max(30),
   website: z.string().max(200).optional(),
 }).strict();
