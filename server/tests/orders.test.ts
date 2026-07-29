@@ -4,7 +4,8 @@ import type { AddressInfo } from "node:net";
 import { createApp } from "../app.js";
 import { AppError } from "../errors.js";
 import type { OrderRepository, StoredOrderInput } from "../repositories/orders.js";
-import { createOrder, getPublicOrderStatus, hashStatusToken } from "../services/orders.js";
+import { createOrder, getPublicOrderStatus, hashStatusToken, lookupOrder } from "../services/orders.js";
+import { parseOrderLookup } from "../validation/lookup.js";
 import { parseCreateOrder } from "../validation/orders.js";
 import { getMigrationDatabaseUrl, getPublicBaseUrl, getRuntimeDatabaseUrl } from "../env.js";
 import { configureProxyTrust } from "../middleware/security.js";
@@ -49,6 +50,20 @@ class MemoryOrders implements OrderRepository {
   async findPublicByTokenHash(tokenHash: string) {
     return this.records.get(tokenHash)?.publicOrder ?? null;
   }
+
+  async findByReferenceForLookup(reference: string) {
+    for (const record of this.records.values()) {
+      if (record.publicOrder.reference === reference) {
+        return { id: record.input.id, customerEmail: record.input.customerEmail, customerPhone: record.input.customerPhone };
+      }
+    }
+    return null;
+  }
+
+  async findCustomerSafeById(id: string) {
+    for (const record of this.records.values()) if (record.input.id === id) return record.publicOrder;
+    return null;
+  }
 }
 
 test("valid order payload is accepted with a human reference and secure status link", async () => {
@@ -58,6 +73,57 @@ test("valid order payload is accepted with a human reference and secure status l
   assert.match(result.statusUrl, /^\/order-status\/[A-Za-z0-9_-]{43}$/);
   assert.equal(result.status, "received");
   assert.equal(repository.records.size, 1);
+});
+
+test("Biryani alone succeeds", async () => {
+  const result = await createOrder(new MemoryOrders(), parseCreateOrder(validPayload));
+  assert.equal(result.items[0].name, "Biryani");
+  assert.equal(result.items[0].spiceLevel, 2);
+});
+
+test("Keer alone succeeds and preserves its non-spicy setting", async () => {
+  const result = await createOrder(new MemoryOrders(), parseCreateOrder({
+    ...validPayload,
+    items: [{ menuItemId: "keer", spiceLevel: 0, peopleCount: 25 }],
+  }));
+  assert.equal(result.items[0].name, "Keer");
+  assert.equal(result.items[0].spiceLevel, 0);
+});
+
+test("Biryani and Keer together succeed", async () => {
+  const result = await createOrder(new MemoryOrders(), parseCreateOrder({
+    ...validPayload,
+    items: [
+      validPayload.items[0],
+      { menuItemId: "keer", spiceLevel: 0, peopleCount: 25 },
+    ],
+  }));
+  assert.deepEqual(result.items.map((item) => item.name), ["Biryani", "Keer"]);
+});
+
+test("other non-spicy dishes succeed with their required configuration", async () => {
+  const result = await createOrder(new MemoryOrders(), parseCreateOrder({
+    ...validPayload,
+    items: [
+      { menuItemId: "gulab-jamun", spiceLevel: 0, peopleCount: 25 },
+      { menuItemId: "plain-white-rice", spiceLevel: 0, peopleCount: 25, extras: { riceType: "plain" } },
+      { menuItemId: "naan", proteinChoice: "regular", spiceLevel: 0, peopleCount: 25 },
+    ],
+  }));
+  assert.deepEqual(result.items.map((item) => item.name), ["Gulab Jamun", "Plain White Rice", "Naan"]);
+  assert.ok(result.items.every((item) => item.spiceLevel === 0));
+});
+
+test("invalid spice values are rejected according to the dish configuration", async () => {
+  const repository = new MemoryOrders();
+  await assert.rejects(
+    () => createOrder(repository, parseCreateOrder({ ...validPayload, items: [{ menuItemId: "keer", spiceLevel: 2, peopleCount: 25 }] })),
+    (error: unknown) => error instanceof AppError && error.statusCode === 400,
+  );
+  await assert.rejects(
+    () => createOrder(repository, parseCreateOrder({ ...validPayload, items: [{ ...validPayload.items[0], spiceLevel: 0 }] })),
+    (error: unknown) => error instanceof AppError && error.statusCode === 400,
+  );
 });
 
 test("empty carts and invalid people counts are rejected", () => {
@@ -80,6 +146,94 @@ test("secure status lookup succeeds and excludes private customer fields", async
   assert.equal("customerEmail" in order, false);
   assert.equal("customerPhone" in order, false);
   assert.equal("statusTokenHash" in order, false);
+});
+
+test("order recovery accepts a matching email or normalized phone without rotating the status token", async () => {
+  const repository = new MemoryOrders();
+  const created = await createOrder(repository, parseCreateOrder(validPayload));
+  const token = created.statusUrl.split("/").pop()!;
+  const originalHash = hashStatusToken(token);
+  const byEmail = await lookupOrder(repository, parseOrderLookup({ reference: created.reference.toLowerCase(), contact: " AMINA@EXAMPLE.COM " }));
+  const byPhone = await lookupOrder(repository, parseOrderLookup({ reference: created.reference, contact: "+1 (555) 555-5555" }));
+  assert.equal(byEmail.reference, created.reference);
+  assert.equal(byPhone.reference, created.reference);
+  assert.equal(repository.records.has(originalHash), true);
+  assert.equal((await getPublicOrderStatus(repository, token)).reference, created.reference);
+  assert.equal("customerEmail" in byEmail, false);
+  assert.equal("customerPhone" in byEmail, false);
+  assert.equal("adminNotes" in byEmail, false);
+  assert.equal("quotedTotalCents" in byEmail, false);
+});
+
+test("order recovery accepts formatted and digits-only phone pairs for ready, completed, and cancelled orders", async () => {
+  for (const status of ["ready", "completed", "cancelled"] as const) {
+    const repository = new MemoryOrders();
+    const created = await createOrder(repository, parseCreateOrder(validPayload));
+    const record = [...repository.records.values()][0];
+    record.input.customerPhone = "15555555555";
+    record.publicOrder = { ...record.publicOrder, status };
+    const result = await lookupOrder(repository, parseOrderLookup({ reference: created.reference, contact: "+1 (555) 555-5555" }));
+    assert.equal(result.status, status);
+  }
+});
+
+test("order recovery accepts a digits-only phone against a formatted stored number", async () => {
+  const repository = new MemoryOrders();
+  const created = await createOrder(repository, parseCreateOrder(validPayload));
+  const result = await lookupOrder(repository, parseOrderLookup({ reference: created.reference, contact: "15555555555" }));
+  assert.equal(result.reference, created.reference);
+});
+
+test("order recovery returns the same safe failure for wrong contacts and missing references", async () => {
+  const repository = new MemoryOrders();
+  const created = await createOrder(repository, parseCreateOrder(validPayload));
+  for (const request of [
+    { reference: created.reference, contact: "wrong@example.com" },
+    { reference: created.reference, contact: "+1 555 000 0000" },
+    { reference: "GHF-2026-ZZZ999", contact: "amina@example.com" },
+  ]) {
+    await assert.rejects(() => lookupOrder(repository, parseOrderLookup(request)), (error: unknown) => error instanceof AppError && error.statusCode === 404 && error.message === "We could not find an order matching those details.");
+  }
+  assert.throws(() => parseOrderLookup({ reference: "not-a-reference", contact: "amina@example.com" }), (error: unknown) => error instanceof AppError && error.statusCode === 400);
+});
+
+test("order lookup endpoint applies rate limiting and returns only customer-safe data", async () => {
+  const repository = new MemoryOrders();
+  const created = await createOrder(repository, parseCreateOrder(validPayload));
+  const app = createApp(repository);
+  const server = await new Promise<any>((resolve) => { const instance = app.listen(0, "127.0.0.1", () => resolve(instance)); });
+  try {
+    const port = (server.address() as AddressInfo).port;
+    const response = await fetch(`http://127.0.0.1:${port}/api/orders/lookup`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ reference: created.reference, contact: validPayload.customerEmail }) });
+    const body = await response.json() as Record<string, unknown>;
+    assert.equal(response.status, 200);
+    assert.ok(response.headers.get("ratelimit"));
+    for (const privateField of ["customerName", "customerEmail", "customerPhone", "statusTokenHash", "adminNotes", "quotedTotalCents"]) assert.equal(privateField in body, false);
+  } finally { await new Promise<void>((resolve) => server.close(() => resolve())); }
+});
+
+test("order lookup accepts a same-origin Vercel forwarded host", async () => {
+  const repository = new MemoryOrders();
+  const created = await createOrder(repository, parseCreateOrder(validPayload));
+  const app = createApp(repository);
+  const server = await new Promise<any>((resolve) => { const instance = app.listen(0, "127.0.0.1", () => resolve(instance)); });
+  try {
+    const port = (server.address() as AddressInfo).port;
+    const response = await fetch(`http://127.0.0.1:${port}/api/orders/lookup`, { method: "POST", headers: { "content-type": "application/json", origin: "https://preview.example.vercel.app", "x-forwarded-host": "preview.example.vercel.app" }, body: JSON.stringify({ reference: created.reference, contact: validPayload.customerPhone }) });
+    assert.equal(response.status, 200);
+  } finally { await new Promise<void>((resolve) => server.close(() => resolve())); }
+});
+
+test("customer status preserves Keer as non-spicy", async () => {
+  const repository = new MemoryOrders();
+  const created = await createOrder(repository, parseCreateOrder({
+    ...validPayload,
+    items: [{ menuItemId: "keer", spiceLevel: 0, peopleCount: 25 }],
+  }));
+  const token = created.statusUrl.split("/").pop()!;
+  const order = await getPublicOrderStatus(repository, token);
+  assert.equal(order.items[0].name, "Keer");
+  assert.equal(order.items[0].spiceLevel, 0);
 });
 
 test("invalid status tokens get the same safe not-found response", async () => {
@@ -164,6 +318,8 @@ test("public status links use configured, Vercel, or current request origins wit
     },
   };
   assert.equal(getPublicBaseUrl(request, { VERCEL: "1" }), "https://preview.example.vercel.app");
+  assert.equal(getPublicBaseUrl({ get: (name: string) => ({ origin: "https://www.gul.example", host: "internal.vercel.app" }[name as "origin" | "host"]) }, { VERCEL: "1" }), "https://www.gul.example");
+  assert.equal(getPublicBaseUrl({ get: (name: string) => name === "origin" ? "https://preview.example.vercel.app" : undefined }, { APP_BASE_URL: "https://www.gul.example" }), "https://preview.example.vercel.app");
   assert.equal(getPublicBaseUrl(undefined, { VERCEL_URL: "gul-halal-food.vercel.app" }), "https://gul-halal-food.vercel.app");
   assert.equal(getPublicBaseUrl(undefined, { APP_BASE_URL: "https://catering.example.com/" }), "https://catering.example.com");
 

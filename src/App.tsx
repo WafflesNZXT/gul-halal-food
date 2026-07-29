@@ -18,12 +18,20 @@ import OrderStatusPage from "@/pages/order-status";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { CartProvider } from "@/contexts/CartContext";
 import { CartDrawer } from "@/components/CartDrawer";
+import AdminLogin from "@/pages/admin-login";
+import AdminOrders from "@/pages/admin-orders";
+import AdminOrderDetail from "@/pages/admin-order-detail";
+import TrackOrder from "@/pages/track-order";
 
 const queryClient = new QueryClient();
 
 function Router() {
   return (
     <Switch>
+      <Route path="/admin/login" component={AdminLogin} />
+      <Route path="/admin/orders/:reference" component={AdminOrderDetail} />
+      <Route path="/admin/orders" component={AdminOrders} />
+      <Route path="/track-order" component={TrackOrder} />
       <Route path="/" component={Home} />
       {/* Legacy slug redirects */}
       <Route path="/menu/chicken-biryani">

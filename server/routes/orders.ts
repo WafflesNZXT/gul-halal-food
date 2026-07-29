@@ -1,8 +1,9 @@
 import { Router } from "express";
 import { PostgresOrderRepository, type OrderRepository } from "../repositories/orders.js";
-import { createOrder, getPublicOrderStatus } from "../services/orders.js";
+import { createOrder, getPublicOrderStatus, lookupOrder } from "../services/orders.js";
 import { parseCreateOrder } from "../validation/orders.js";
-import { orderRateLimit, requireTrustedOrigin } from "../middleware/security.js";
+import { parseOrderLookup } from "../validation/lookup.js";
+import { orderLookupRateLimit, orderRateLimit, requireJsonContent, requireTrustedOrigin } from "../middleware/security.js";
 import { getPublicBaseUrl } from "../env.js";
 
 export function createOrdersRouter(repository: OrderRepository = new PostgresOrderRepository()) {
@@ -20,6 +21,14 @@ export function createOrdersRouter(repository: OrderRepository = new PostgresOrd
   router.get("/orders/status/:token", async (req: any, res: any, next: any) => {
     try {
       return res.json(await getPublicOrderStatus(repository, req.params.token));
+    } catch (error) {
+      return next(error);
+    }
+  });
+
+  router.post("/orders/lookup", orderLookupRateLimit, requireTrustedOrigin, requireJsonContent, async (req: any, res: any, next: any) => {
+    try {
+      return res.json(await lookupOrder(repository, parseOrderLookup(req.body)));
     } catch (error) {
       return next(error);
     }

@@ -22,8 +22,9 @@ function configuredOrigins() {
 export function requireTrustedOrigin(req: any, res: any, next: any) {
   const origin = req.get("origin");
   if (!origin) return next();
+  const requestHost = req.get("x-forwarded-host")?.split(",")[0]?.trim() || req.get("host");
   const sameHost = (() => {
-    try { return new URL(origin).host === req.get("host"); } catch { return false; }
+    try { return new URL(origin).host === requestHost; } catch { return false; }
   })();
   if (sameHost || configuredOrigins().includes(origin)) return next();
   return res.status(403).json({ error: { code: "FORBIDDEN", message: "This request was not accepted." } });
@@ -36,3 +37,24 @@ export const orderRateLimit = rateLimit({
   legacyHeaders: false,
   message: { error: { code: "RATE_LIMITED", message: "Too many order requests. Please try again later." } },
 });
+
+export const orderLookupRateLimit = rateLimit({
+  windowMs: Number(process.env.ORDER_LOOKUP_RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000,
+  limit: Number(process.env.ORDER_LOOKUP_RATE_LIMIT_MAX) || 10,
+  standardHeaders: "draft-8",
+  legacyHeaders: false,
+  message: { error: { code: "RATE_LIMITED", message: "We could not find an order matching those details." } },
+});
+
+export const adminLoginRateLimit = rateLimit({
+  windowMs: Number(process.env.ADMIN_LOGIN_RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000,
+  limit: Number(process.env.ADMIN_LOGIN_RATE_LIMIT_MAX) || 5,
+  standardHeaders: "draft-8",
+  legacyHeaders: false,
+  message: { error: { code: "RATE_LIMITED", message: "Too many sign-in attempts. Please try again later." } },
+});
+
+export function requireJsonContent(req: any, res: any, next: any) {
+  if (!req.is("application/json")) return res.status(415).json({ error: { code: "UNSUPPORTED_MEDIA_TYPE", message: "This request was not accepted." } });
+  return next();
+}

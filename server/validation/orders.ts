@@ -8,7 +8,7 @@ const optionalTrimmed = (max: number) => z.string().trim().max(max).optional().t
 const itemSchema = z.object({
   menuItemId: z.string().trim().min(1).max(80),
   proteinChoice: z.string().trim().min(1).max(40).optional(),
-  spiceLevel: z.union([z.literal(1), z.literal(2), z.literal(3)]),
+  spiceLevel: z.union([z.literal(0), z.literal(1), z.literal(2), z.literal(3)]),
   extras: z.record(z.string().max(60), z.string().trim().max(80)).optional(),
   peopleCount: z.number().int().min(1).max(10000),
 }).strict();

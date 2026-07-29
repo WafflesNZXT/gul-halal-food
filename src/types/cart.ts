@@ -1,4 +1,6 @@
-export type SpiceLevelValue = 1 | 2 | 3;
+import type { SpiceLevel } from "@/shared/orders";
+
+export type SpiceLevelValue = SpiceLevel;
 
 /** Uniquely identifies a configured cart line */
 export type CartItemConfig = {

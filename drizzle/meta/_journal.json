@@ -8,6 +8,13 @@
       "when": 1785269656320,
       "tag": "0000_quiet_speed",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1785284068466,
+      "tag": "0001_equal_mentallo",
+      "breakpoints": true
     }
   ]
 }

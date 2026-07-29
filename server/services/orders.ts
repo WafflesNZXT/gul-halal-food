@@ -1,8 +1,9 @@
-import { createHash, randomBytes, randomUUID } from "node:crypto";
+import { createHash, randomBytes, randomUUID, timingSafeEqual } from "node:crypto";
 import type { CreateOrderRequest, CreateOrderResponse, CustomerOrder } from "../../src/shared/orders.js";
 import { validateMenuOrderItems } from "../../src/shared/menu-validation.js";
 import { AppError, notFound } from "../errors.js";
 import type { OrderRepository } from "../repositories/orders.js";
+import type { LookupRequest } from "../validation/lookup.js";
 
 export function hashStatusToken(token: string) {
   return createHash("sha256").update(token).digest("hex");
@@ -61,5 +62,33 @@ export async function getPublicOrderStatus(repository: OrderRepository, token: s
   if (!/^[A-Za-z0-9_-]{43,128}$/.test(token)) throw notFound();
   const order = await repository.findPublicByTokenHash(hashStatusToken(token));
   if (!order) throw notFound();
+  return order;
+}
+
+function normalizedPhone(value: string) { return value.replace(/\D/g, ""); }
+function normalizedContact(value: string) {
+  const candidate = value.trim();
+  if (candidate.includes("@")) return { type: "email" as const, value: candidate.toLowerCase() };
+  const digits = normalizedPhone(candidate);
+  return digits.length >= 7 && digits.length <= 15 ? { type: "phone" as const, value: digits } : null;
+}
+function contactMatches(left: string, right: string) {
+  const leftHash = createHash("sha256").update(left).digest();
+  const rightHash = createHash("sha256").update(right).digest();
+  return timingSafeEqual(leftHash, rightHash);
+}
+const lookupNotFound = () => new AppError(404, "NOT_FOUND", "We could not find an order matching those details.");
+
+export async function lookupOrder(repository: OrderRepository, request: LookupRequest): Promise<CustomerOrder> {
+  const suppliedContact = normalizedContact(request.contact);
+  if (!suppliedContact) throw lookupNotFound();
+  const match = await repository.findByReferenceForLookup(request.reference);
+  if (!match) throw lookupNotFound();
+  const emailMatches = suppliedContact.type === "email" && contactMatches(suppliedContact.value, match.customerEmail.trim().toLowerCase());
+  const storedPhone = normalizedPhone(match.customerPhone);
+  const phoneMatches = suppliedContact.type === "phone" && storedPhone.length >= 7 && contactMatches(suppliedContact.value, storedPhone);
+  if (!emailMatches && !phoneMatches) throw lookupNotFound();
+  const order = await repository.findCustomerSafeById(match.id);
+  if (!order) throw lookupNotFound();
   return order;
 }
