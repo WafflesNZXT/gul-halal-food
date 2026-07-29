@@ -8,6 +8,7 @@ import {
 } from "react-icons/fa";
 import { Link } from "wouter";
 import { BrandLockup } from "@/components/BrandLockup";
+import { StaffLoginLink } from "@/components/StaffLoginLink";
 
 export function Footer() {
   const hasContactDetails = Boolean(config.address || config.phone || config.email);
@@ -99,9 +100,10 @@ export function Footer() {
 
         <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-[#DDE8C8]/60">
           <p>&copy; {new Date().getFullYear()} {config.businessName}. All rights reserved.</p>
-          <div className="flex gap-6">
+          <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 md:justify-end">
             <span>Privacy policy coming soon</span>
             <span>Terms coming soon</span>
+            <StaffLoginLink />
           </div>
         </div>
       </div>
