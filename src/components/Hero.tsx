@@ -78,21 +78,14 @@ export function Hero() {
               className="w-full max-w-[22rem] text-[2.25rem] sm:text-5xl md:max-w-none md:text-6xl lg:text-6xl xl:text-7xl font-display font-bold leading-[1.1] text-primary drop-shadow-sm"
             >
               <span className="md:hidden">
-                Homemade <br />
-                Pakistani Food, <br />
-                Made with{" "}
-                <span className="text-secondary inline-flex items-center gap-1">
-                  Love{" "}
-                  <HeartSparkle className="hidden h-7 w-7 text-secondary sm:block" />
-                </span>
+                Delicious, authentic <br />
+                Pakistani meals, <br />
+                prepared with <span className="text-secondary">Care and Hygiene</span>
               </span>
               <span className="hidden md:inline">
-                Homemade Pakistani <br />
-                Food, Made with{" "}
-                <span className="text-secondary inline-flex items-center gap-2">
-                  Love{" "}
-                  <HeartSparkle className="h-10 w-10 lg:h-12 lg:w-12 text-secondary" />
-                </span>
+                Delicious, authentic <br />
+                Pakistani meals, prepared with{" "}
+                <span className="text-secondary">Care and Hygiene</span>
               </span>
             </motion.h1>
 
@@ -201,7 +194,7 @@ export function Hero() {
 
               {/* Since 1985 badge */}
               <div className="absolute top-1/2 -left-8 bg-card/90 backdrop-blur-sm px-4 py-2 rounded-xl shadow-lg border border-border flex items-center gap-2 z-20">
-                <Star className="w-5 h-5 fill-amber-400 text-amber-400" />
+                <Star className="w-5 h-5 fill-secondary text-secondary" />
                 <span className="font-bold text-sm">Since 1985</span>
               </div>
             </motion.div>

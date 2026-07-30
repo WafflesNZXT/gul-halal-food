@@ -9,14 +9,14 @@ export function WhyChooseUs() {
   const themeStyles: Record<string, string> = {
     sage: "bg-[#DDE8C8] text-primary border-[#C2D6A1]",
     cream: "bg-[#FFF8E8] text-secondary border-[#F7E1B1]",
-    forest: "bg-[#0e2710] text-white border-[#f97316]/60 shadow-[0_4px_24px_rgba(249,115,22,0.12)]",
+    forest: "bg-[#0e2710] text-white border-secondary/60 shadow-[0_4px_24px_rgba(172,32,32,0.12)]",
     ivory: "bg-[#FFFDF7] text-foreground border-border",
   };
 
   const iconColors: Record<string, string> = {
     sage: "text-primary",
     cream: "text-secondary",
-    forest: "text-[#f97316]",
+    forest: "text-secondary",
     ivory: "text-primary",
   };
 

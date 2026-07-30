@@ -41,7 +41,7 @@ export function TrustFeatures() {
         </div>
         <div className="flex flex-col">
           <span className="font-bold text-sm text-foreground leading-tight">For Every Occasion</span>
-          <span className="text-xs text-foreground/70 leading-tight">Weddings & parties</span>
+          <span className="text-xs text-foreground/70 leading-tight">Community Programs & Family Gatherings</span>
         </div>
       </div>
     </div>

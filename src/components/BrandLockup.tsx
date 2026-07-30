@@ -13,9 +13,10 @@ export function BrandLockup({ variant = "header", scrolled = false, className }:
   const isFooter = variant === "footer";
   const isCompact = variant === "compact";
 
-  // When scrolled (dark green navbar): Gul, Halal, Pakistani Catering → white; Food → orange (unchanged)
+  // When scrolled (dark green navbar): Gul, Halal, Pakistani Catering → white; Food remains brand red.
   const gulColor = isFooter ? "text-[#FFF8E8]" : scrolled ? "text-white" : "text-primary";
   const halalColor = isFooter ? "text-[#DDE8C8]" : scrolled ? "text-white" : "text-primary";
+  const foodColor = isFooter ? "text-secondary" : scrolled ? "text-[#FECACA]" : "text-secondary";
   const taglineColor = isFooter ? "text-[#DDE8C8]/85" : scrolled ? "text-white/90" : "text-primary/70";
 
   return (
@@ -57,7 +58,7 @@ export function BrandLockup({ variant = "header", scrolled = false, className }:
           )}
         >
           <span className={cn("motion-safe:transition-colors motion-safe:duration-300", halalColor)}>Halal </span>
-          <span className="text-secondary">Food</span>
+          <span className={foodColor}>Food</span>
         </span>
 
         <span
