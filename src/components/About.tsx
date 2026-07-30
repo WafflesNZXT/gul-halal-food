@@ -3,10 +3,7 @@ import { SectionHeading } from "./SectionHeading";
 import { Reveal } from "./Reveal";
 import { Link } from "wouter";
 
-// Use the cleaned version of the family photo (dustbin/trash can cropped out)
-const familyPackingPhoto = `${import.meta.env.BASE_URL.replace(/\/$/, "")}/images/about/family-packing-naan-clean.webp`;
-// Fallback to original if cleaned version not yet available
-const familyPackingPhotoFallback = `${import.meta.env.BASE_URL.replace(/\/$/, "")}/images/about/grandparents-packing-naan.webp`;
+const familyCookingPhoto = `${import.meta.env.BASE_URL.replace(/\/$/, "")}/images/about/family-cooking-care.webp`;
 
 export function About() {
   return (
@@ -18,16 +15,12 @@ export function About() {
         <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
           
           <Reveal className="w-full lg:w-1/2">
-            <div className="relative mx-auto w-full max-w-2xl overflow-hidden rounded-t-[42%] rounded-b-3xl border-2 border-primary/35 bg-card p-2 shadow-xl">
-              <div className="relative aspect-[16/10] overflow-hidden rounded-t-[40%] rounded-b-2xl">
+            <div className="relative mx-auto w-full max-w-md overflow-hidden rounded-t-[42%] rounded-b-3xl border-2 border-primary/35 bg-card p-2 shadow-xl">
+              <div className="relative aspect-[3/4] overflow-hidden rounded-t-[40%] rounded-b-2xl">
                 <img
-                  src={familyPackingPhoto}
-                  alt="Family members packing naan for Gul Halal Food catering orders in their kitchen."
-                  className="h-full w-full object-cover object-[52%_48%]"
-                  onError={(e) => {
-                    // Fallback to original photo if cleaned version not available
-                    (e.currentTarget as HTMLImageElement).src = familyPackingPhotoFallback;
-                  }}
+                  src={familyCookingPhoto}
+                  alt="Family member carefully preparing a Gul Halal Food catering dish."
+                  className="h-full w-full object-cover object-center"
                 />
               </div>
               <div aria-hidden="true" className="absolute -right-2 -top-2 text-secondary/80">

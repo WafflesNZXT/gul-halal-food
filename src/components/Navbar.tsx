@@ -80,9 +80,9 @@ export function Navbar() {
   const navTopClass =
     "bg-[#fffaf0]/70 backdrop-blur-sm border border-[#e8dfc8]/60 shadow-sm";
 
-  const linkScrolled = "text-white/90 hover:text-[#f97316]";
+  const linkScrolled = "text-white/90 hover:text-[#DDE8C8]";
   const linkTop = "text-foreground/80 hover:text-primary";
-  const linkActiveScrolled = "text-[#f97316]";
+  const linkActiveScrolled = "text-[#FFF8E8]";
   const linkActiveTop = "text-primary";
 
   return (
@@ -136,7 +136,7 @@ export function Navbar() {
                       {link.name}
                       <span
                         className={`absolute bottom-1 left-0 h-0.5 rounded-full motion-safe:transition-all ${
-                          isScrolled ? "bg-[#f97316]" : "bg-primary"
+                          isScrolled ? "bg-[#DDE8C8]" : "bg-primary"
                         } ${isActive ? "w-full" : "w-0 group-hover:w-full"}`}
                       />
                     </Link>

@@ -2,6 +2,7 @@ import React from "react";
 import { Layout } from "@/components/Layout";
 import { Hero } from "@/components/Hero";
 import { FeaturedMenu } from "@/components/FeaturedMenu";
+import { IngredientCare } from "@/components/IngredientCare";
 import { CateringServices } from "@/components/CateringServices";
 import { About } from "@/components/About";
 import { Gallery } from "@/components/Gallery";
@@ -13,6 +14,7 @@ export default function Home() {
     <Layout>
       <Hero />
       <FeaturedMenu />
+      <IngredientCare />
       <CateringServices />
       <About />
       <Gallery preview />
